@@ -1,4 +1,4 @@
-﻿using NADashboard.Models;
+using NADashboard.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -134,7 +134,15 @@ namespace NADashboard.Controllers
                     (district == "0" || r.DistrictId == district);
                 var result = Json(new {
                     year, previous,
-                    crops = all.GroupBy(r => r.CropId).Select(g => new { id = g.Key, name = g.First().CropName }).OrderBy(c => c.name),
+                    crops = db.Database.SqlQuery<CropCatalogEntry>(@"
+                        SELECT c.id, c.name, COALESCE(cat.CategoryKey,'uncategorized') CategoryKey,
+                               COALESCE(cat.Name,'Uncategorized') Category,
+                               COALESCE(a.IconKey,cat.IconKey,'shell-sprout') Icon
+                        FROM dbo.Crops c
+                        LEFT JOIN dbo.CropCategoryAssignments a ON a.CropId=c.id
+                        LEFT JOIN dbo.CropCategories cat ON cat.CategoryKey=a.CategoryKey")
+                        .ToList().Where(c => all.Any(r => r.CropId == c.Id))
+                        .Select(c => new { id = c.Id, name = c.Name, categoryKey = c.CategoryKey, category = c.Category, icon = c.Icon }).OrderBy(c => c.name),
                     years,
                     geography,
                     reportingAreas = all.Where(r => r.FiscalYear == year).Select(r => new { province = r.ProvinceId, division = r.DivisionId, district = r.DistrictId }).Distinct(),
@@ -289,6 +297,15 @@ namespace NADashboard.Controllers
             }
 
         }
+    }
+
+    public class CropCatalogEntry
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string CategoryKey { get; set; }
+        public string Category { get; set; }
+        public string Icon { get; set; }
     }
 
     public class CropObservation

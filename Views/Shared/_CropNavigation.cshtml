@@ -35,15 +35,17 @@
                         }
                     </div>
                 </details>
-            } else {
-            <a href="@Url.Action(item.Action, "Crops")" data-nav="@item.Page" class="@(active ? "active" : "")" aria-current="@(active && item.Page != "area" ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-" + item.Icon)"></use></svg></span><span class="menu-copy"><strong>@item.Title</strong><small>@item.Detail</small></span><svg class="shell-icon menu-arrow" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg></a>
-            }
-            if (item.Page == "area") {
-                <div class="area-submenu" aria-label="Area profile levels">
+            } else if (item.Page == "area") {
+                <details class="comparison-menu-group area-profile-menu-group">
+                    <summary data-nav="area" class="@(active ? "active" : "")"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-pin")"></use></svg></span><span class="menu-copy"><strong>Area profile</strong><small>Explore your region</small></span><svg class="shell-icon menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></summary>
+                <div class="area-submenu comparison-submenu profile-submenu" aria-label="Area profile levels">
                     <a href="@Url.Action("ProvinceProfile", "Crops")" data-area-nav="province" class="@(areaLevel == "province" ? "active" : "")" aria-current="@(areaLevel == "province" ? "page" : null)">Provinces</a>
                     <a href="@Url.Action("DivisionProfile", "Crops")" data-area-nav="division" class="@(areaLevel == "division" ? "active" : "")" aria-current="@(areaLevel == "division" ? "page" : null)">Divisions</a>
                     <a href="@Url.Action("DistrictProfile", "Crops")" data-area-nav="district" class="@(areaLevel == "district" ? "active" : "")" aria-current="@(areaLevel == "district" ? "page" : null)">Districts</a>
                 </div>
+                </details>
+            } else {
+            <a href="@Url.Action(item.Action, "Crops")" data-nav="@item.Page" class="@(active ? "active" : "")" aria-current="@(active && item.Page != "area" ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-" + item.Icon)"></use></svg></span><span class="menu-copy"><strong>@item.Title</strong><small>@item.Detail</small></span><svg class="shell-icon menu-arrow" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg></a>
             }
         }
     </nav>

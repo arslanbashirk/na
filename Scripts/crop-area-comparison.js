@@ -95,6 +95,7 @@
         renderCharts(); renderHistory(); renderTable(); renderMaps();
     }
     function draw(id, config, hasData) {
+        window.CropCategoryIcons.decorate(config, metadata?.crops, root);
         if (charts[id]) { charts[id].destroy(); delete charts[id]; }
         if (!hasData || !window.Highcharts) { el(id).innerHTML = '<div class="empty-chart">' + (window.Highcharts ? 'No valid comparisons for this selection' : 'Chart library could not be loaded') + '</div>'; return; }
         charts[id] = Highcharts.chart(id, Object.assign({ chart: { type: 'bar', animation: !reduced, backgroundColor: 'transparent', style: { fontFamily: 'DM Sans, sans-serif' } }, title: { text: null }, credits: { enabled: false }, colors: [colorA, colorB], accessibility: { enabled: true }, legend: { itemStyle: { fontSize: '10px' } }, tooltip: { valueDecimals: 1 }, plotOptions: { series: { animation: !reduced, borderRadius: 2 } } }, config));
@@ -122,7 +123,7 @@
         Object.keys(charts).filter(id => id.startsWith('history-')).forEach(id => { charts[id].destroy(); delete charts[id]; });
         const items = rows.filter(r => r.a && r.b).slice(0, 6), metric = el('history-metric').value;
         const years = Array.from(new Set(datasets.flatMap(d => d.history.map(r => r.FiscalYear)))).filter(y => y <= state.year).sort();
-        el('history-charts').innerHTML = items.map((r, i) => '<article class="comparison-history-card"><h3>' + esc(r.name) + '</h3><div id="history-' + i + '" class="comparison-history-chart"></div></article>').join('') || '<div class="empty-chart">No crops are reported in both areas for this year.</div>';
+        el('history-charts').innerHTML = items.map((r, i) => '<article class="comparison-history-card"><h3>' + window.CropCategoryIcons.label(metadata?.crops, r.name, root) + '</h3><div id="history-' + i + '" class="comparison-history-chart"></div></article>').join('') || '<div class="empty-chart">No crops are reported in both areas for this year.</div>';
         items.forEach((crop, i) => {
             const series = ['a', 'b'].map(side => { const lookup = historyFor(side, crop.id); return { name: side.toUpperCase() + ': ' + areaName(side), data: years.map(y => lookup.get(y)?.[metric] ?? null), color: side === 'a' ? colorA : colorB, connectNulls: false, marker: { enabled: false } }; });
             draw('history-' + i, { chart: { type: 'line', animation: !reduced, backgroundColor: 'transparent' }, xAxis: { categories: years, tickInterval: Math.max(1, Math.ceil(years.length / 6)) }, yAxis: { title: { text: metric === 'Yield' ? 'Production / area' : 'Reported units' } }, tooltip: { shared: true, valueDecimals: metric === 'Yield' ? 3 : 1 }, series }, series.some(s => s.data.some(n => n != null)));

@@ -17,7 +17,7 @@
     const palette = ['#08a783', '#f3b324', '#7161d4', '#ee7955', '#159bc2', '#80b642', '#d0528b', '#398d86'];
     const drillStack = [];
     const colorFor = id => palette[(Number(id) || 0) % palette.length];
-    const cropSymbol = name => /potato|taro|yam/i.test(name) ? 'potato' : /wheat|barley|millet|sorghum/i.test(name) ? 'wheat' : /rice|paddy/i.test(name) ? 'rice' : /maize|corn/i.test(name) ? 'maize' : /cotton/i.test(name) ? 'cotton' : /sugar|cane/i.test(name) ? 'cane' : /gram|mong|mash|masoor|mattar|bean|pea|pulse/i.test(name) ? 'pulse' : /apple|banana|mango|orange|citrus|fruit|grape|date|fig|melon/i.test(name) ? 'fruit' : 'vegetable';
+    const cropSymbol = name => window.CropCategoryIcons.symbol(data?.crops, name);
     const iconUrl = name => root + 'Content/crop-icons.svg#' + cropSymbol(name);
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const names = { overview: 'Overview', crop: 'Crop profile', area: 'Area profile', compare: 'Rankings & race' };
@@ -160,6 +160,7 @@
         renderTable();
     }
     function chart(id, config, hasData) {
+        window.CropCategoryIcons.decorate(config, data?.crops, root);
         if (!window.Highcharts) { $id(id).innerHTML = '<div class="empty-chart">Chart library could not be loaded.</div>'; return; }
         if (charts[id]) charts[id].destroy();
         if (!hasData) { delete charts[id]; $id(id).innerHTML = '<div class="empty-chart">No observations for this selection</div>'; return; }

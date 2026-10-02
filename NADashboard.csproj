@@ -948,6 +948,8 @@
     <Content Include="Views\Crops\Dashboard.cshtml" />
     <Content Include="Views\Crops\AreaDashboard.cshtml" />
     <Content Include="Scripts\crop-area.js" />
+    <Content Include="Scripts\crop-category-icons.js" />
+    <Content Include="Database\CropCategories.sql" />
     <Content Include="Views\Crops\AreaComparison.cshtml" />
     <Content Include="Views\Crops\About.cshtml" />
     <Content Include="Scripts\crop-area-comparison.js" />

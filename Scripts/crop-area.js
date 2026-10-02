@@ -93,6 +93,7 @@
         finally { if (seq === serial) body.classList.remove('busy'); }
     }
     function draw(id, config, hasData) {
+        window.CropCategoryIcons.decorate(config, metadata?.crops, root);
         if (charts[id]) { charts[id].destroy(); delete charts[id]; }
         if (!window.Highcharts || !hasData) { el(id).innerHTML = '<div class="empty-chart">' + (window.Highcharts ? 'No complete observations for this selection' : 'Chart library could not be loaded') + '</div>'; return; }
         charts[id] = Highcharts.chart(id, Object.assign({ title: { text: null }, credits: { enabled: false }, accessibility: { enabled: true }, colors, chart: { backgroundColor: 'transparent', animation: !reduced, style: { fontFamily: 'DM Sans, sans-serif' } } }, config));
@@ -123,7 +124,7 @@
         const mix = crops.filter(c => c.Area != null);
         el('portfolio-chart').style.height = Math.max(330, mix.length * 25 + 80) + 'px';
         draw('portfolio-chart', { chart: { type: 'bar', backgroundColor: 'transparent', animation: !reduced }, xAxis: { categories: mix.map(c => c.name) }, yAxis: { title: { text: 'Cultivation area / reported units' } }, legend: { enabled: false }, tooltip: { valueDecimals: 1 }, series: [{ name: 'Area', data: mix.map((c, i) => ({ y: c.Area, color: colors[i % colors.length] })) }] }, mix.length);
-        el('production-crops').innerHTML = crops.length ? crops.map((c, i) => '<article class="production-crop" style="--crop-color:' + colors[i % colors.length] + '"><div><strong>' + esc(c.name) + '</strong><span>' + num(c.Production) + ' <small>reported units</small></span><small>YoY ' + pct(c.Growth) + '</small></div><div class="crop-mini-trend">' + spark(yearsFor(c), 'Production') + '</div></article>').join('') : '<p class="empty-chart">No crops reported for this year.</p>';
+        el('production-crops').innerHTML = crops.length ? crops.map((c, i) => '<article class="production-crop" style="--crop-color:' + colors[i % colors.length] + '"><div><strong>' + window.CropCategoryIcons.label(metadata?.crops, c.name, root) + '</strong><span>' + num(c.Production) + ' <small>reported units</small></span><small>YoY ' + pct(c.Growth) + '</small></div><div class="crop-mini-trend">' + spark(yearsFor(c), 'Production') + '</div></article>').join('') : '<p class="empty-chart">No crops reported for this year.</p>';
         renderProgress(); renderTable(); renderMap();
     }
     function renderProgress() {
