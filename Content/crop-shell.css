@@ -1,4 +1,18 @@
 /* Shared navigation, masthead and closing panel for the crop workspace. */
+.crop-shell .table-scroll td { color: #243b30; font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.crop-shell .table-scroll th { background: #e5eedf; color: #213e30; font-size: 10px; font-weight: 750; }
+.crop-shell .table-scroll tbody tr:nth-child(even) td { background: #f3f7ef; }
+.crop-shell .table-scroll tbody tr:hover td { background: #e7f0e2; }
+.crop-shell .table-scroll .table-focus, .crop-shell .table-scroll td a { color: #154b36; font-weight: 700; }
+.crop-shell .table-scroll td.positive { color: #17633a; font-weight: 650; }
+.crop-shell .table-scroll td.negative { color: #a7332e; font-weight: 650; }
+.crop-shell .table-footer { color: #344d3d; font-size: 11px; flex-wrap: wrap; }
+.crop-shell .table-footer .table-export-note { margin-right: 0; font-size: 10px; color: #475e4e; }
+#table-download { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; font-size: 11px; }
+#table-download .shell-icon { width: 16px; height: 16px; }
+#data-section .panel-heading { flex-wrap: wrap; }
+#data-section .table-tools { flex-wrap: wrap; }
+@media (max-width: 720px) { .crop-shell .table-scroll td { font-size: 13px; } }
 .crop-shell { --shell-emerald: #0d5545; --shell-gold: #f5ca68; }
 .shell-icon { width: 20px; height: 20px; flex-shrink: 0; display: block; }
 .skip-link { position: fixed; top: -80px; left: 20px; padding: 12px 18px; z-index: 1300; background: #fff4ce; color: #163c32; border-radius: 8px; }

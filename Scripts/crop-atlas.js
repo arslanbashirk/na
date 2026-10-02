@@ -341,6 +341,7 @@
     $id('table-next').onclick = () => { tablePage++; renderTable(); };
     $id('data-table').addEventListener('click', e => { const record = e.target.closest('[data-record]'); if (record) { if (record.dataset.recordKind === 'crops') focus({ crop: record.dataset.record }); else drillArea(record.dataset.record, 'district'); return; } const button = e.target.closest('[data-sort]'); if (!button) return; sortAscending = sortKey === button.dataset.sort ? !sortAscending : button.dataset.sort === 'name'; sortKey = button.dataset.sort; renderTable(); });
     $id('download').onclick = exportCsv;
+    $id('table-download').onclick = exportCsv;
     $id('share').onclick = async () => { try { await navigator.clipboard.writeText(location.href); status('View link copied. It includes the selected crop, year and geography.'); } catch (e) { status('Copy this view link from your browser address bar.'); } };
     document.addEventListener('visibilitychange', () => { if (document.hidden) stopRace(); });
     window.addEventListener('pagehide', stopRace);
