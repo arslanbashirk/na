@@ -1,0 +1,13 @@
+﻿@{ Layout = null; }
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>@ViewBag.Title ? Crop Atlas</title><link rel="stylesheet" href="@Url.Content("~/Content/crop-atlas.css")" /><link rel="stylesheet" href="@Url.Content("~/Content/crop-theme.css")" /><link rel="stylesheet" href="@Url.Content("~/Content/crop-shell.css")" /></head>
+<body id="page-top" class="admin-page crop-shell">
+    @Html.Partial("_CropNavigation")
+    <main class="workspace" id="main-content">
+        @Html.Partial("_CropHeader")
+        @RenderBody()
+        @Html.Partial("_CropFooter")
+    </main>
+    <script src="@Url.Content("~/Scripts/crop-shell.js")"></script>
+    @RenderSection("scripts", false)
+</body></html>

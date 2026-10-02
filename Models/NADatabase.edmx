@@ -1,0 +1,598 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="NationalAccountsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ds">
+          <Key>
+            <PropertyRef Name="dsid" />
+          </Key>
+          <Property Name="dvid" Type="char" MaxLength="2" />
+          <Property Name="dsid" Type="char" MaxLength="3" Nullable="false" />
+          <Property Name="ds" Type="varchar" MaxLength="40" />
+        </EntityType>
+        <EntityType Name="dv">
+          <Key>
+            <PropertyRef Name="dvid" />
+          </Key>
+          <Property Name="pvid" Type="char" MaxLength="1" />
+          <Property Name="dvid" Type="char" MaxLength="2" Nullable="false" />
+          <Property Name="dv" Type="varchar" MaxLength="30" Nullable="false" />
+        </EntityType>
+        <EntityType Name="pv">
+          <Key>
+            <PropertyRef Name="pvid" />
+          </Key>
+          <Property Name="pvid" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="pv" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="Year">
+          <Key>
+            <PropertyRef Name="fiscalyear" />
+          </Key>
+          <Property Name="fiscalyear" Type="varchar" MaxLength="9" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ds_dv">
+          <End Role="dv" Type="Self.dv" Multiplicity="0..1" />
+          <End Role="ds" Type="Self.ds" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dv">
+              <PropertyRef Name="dvid" />
+            </Principal>
+            <Dependent Role="ds">
+              <PropertyRef Name="dvid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="getCards" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="cropid" Type="int" Mode="In" />
+          <Parameter Name="year" Type="varchar" Mode="In" />
+          <Parameter Name="level" Type="int" Mode="In" />
+          <Parameter Name="id" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getCropdata" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="pvid" Type="char" Mode="In" />
+          <Parameter Name="dvid" Type="char" Mode="In" />
+          <Parameter Name="dsid" Type="char" Mode="In" />
+          <Parameter Name="year" Type="varchar" Mode="In" />
+          <Parameter Name="cropid" Type="int" Mode="In" />
+        </Function>
+        <Function Name="getCropHierarchyWise" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="cropid" Type="int" Mode="In" />
+          <Parameter Name="year" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getCropMap" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="cropid" Type="int" Mode="In" />
+          <Parameter Name="level" Type="int" Mode="In" />
+          <Parameter Name="id" Type="varchar" Mode="In" />
+          <Parameter Name="year" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getCrops" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="getCropYearly" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="cropid" Type="int" Mode="In" />
+          <Parameter Name="level" Type="int" Mode="In" />
+          <Parameter Name="id" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getGDP" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="months" Type="int" Mode="In" />
+          <Parameter Name="currency" Type="varchar" Mode="In" />
+          <Parameter Name="price" Type="varchar" Mode="In" />
+          <Parameter Name="output" Type="varchar" Mode="In" />
+          <Parameter Name="fyear" Type="int" Mode="In" />
+        </Function>
+        <Function Name="getGDPbreakdown" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="months" Type="int" Mode="In" />
+          <Parameter Name="currency" Type="varchar" Mode="In" />
+          <Parameter Name="price" Type="varchar" Mode="In" />
+          <Parameter Name="output" Type="varchar" Mode="In" />
+          <Parameter Name="fyear" Type="int" Mode="In" />
+        </Function>
+        <Function Name="getGrowths" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="months" Type="int" Mode="In" />
+          <Parameter Name="currency" Type="varchar" Mode="In" />
+          <Parameter Name="price" Type="varchar" Mode="In" />
+          <Parameter Name="from" Type="int" Mode="In" />
+          <Parameter Name="to" Type="int" Mode="In" />
+        </Function>
+        <Function Name="getSimpleCards" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="cropid" Type="int" Mode="In" />
+          <Parameter Name="year" Type="varchar" Mode="In" />
+          <Parameter Name="level" Type="int" Mode="In" />
+          <Parameter Name="id" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getTaxes" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="year" Type="int" Mode="In" />
+          <Parameter Name="sector" Type="varchar" Mode="In" />
+          <Parameter Name="subsector" Type="varchar" Mode="In" />
+          <Parameter Name="title" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getWorldGDP" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="year" Type="int" Mode="In" />
+          <Parameter Name="cc" Type="varchar" Mode="In" />
+          <Parameter Name="c3" Type="varchar" Mode="In" />
+          <Parameter Name="output" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="getWorldYear" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="c3" Type="varchar" Mode="In" />
+        </Function>
+        <Function Name="WorldCropMap" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="year" Type="varchar" Mode="In" />
+          <Parameter Name="crop" Type="int" Mode="In" />
+          <Parameter Name="country" Type="varchar" Mode="In" />
+        </Function>
+        <EntityContainer Name="NationalAccountsModelStoreContainer">
+          <EntitySet Name="ds" EntityType="Self.ds" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="dv" EntityType="Self.dv" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="pv" EntityType="Self.pv" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Year" EntityType="Self.Year" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ds_dv" Association="Self.FK_ds_dv">
+            <End Role="dv" EntitySet="dv" />
+            <End Role="ds" EntitySet="ds" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="NationalAccountsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="NationalAccountsEntities" annotation:LazyLoadingEnabled="true" >
+          <EntitySet Name="ds" EntityType="NationalAccountsModel.d" />
+          <EntitySet Name="dvs" EntityType="NationalAccountsModel.dv" />
+          <EntitySet Name="pvs" EntityType="NationalAccountsModel.pv" />
+          <EntitySet Name="Years" EntityType="NationalAccountsModel.Year" />
+          <AssociationSet Name="FK_ds_dv" Association="NationalAccountsModel.FK_ds_dv">
+            <End Role="dv" EntitySet="dvs" />
+            <End Role="d" EntitySet="ds" />
+          </AssociationSet>
+          <FunctionImport Name="getCropYearly" ReturnType="Collection(NationalAccountsModel.getCropYearly_Result)">
+            <Parameter Name="cropid" Mode="In" Type="Int32" />
+            <Parameter Name="level" Mode="In" Type="Int32" />
+            <Parameter Name="id" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getCards" ReturnType="Collection(NationalAccountsModel.getCards_Result)">
+            <Parameter Name="cropid" Mode="In" Type="Int32" />
+            <Parameter Name="year" Mode="In" Type="String" />
+            <Parameter Name="level" Mode="In" Type="Int32" />
+            <Parameter Name="id" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getCropdata" ReturnType="Collection(NationalAccountsModel.getCropdata_Result)">
+            <Parameter Name="pvid" Mode="In" Type="String" />
+            <Parameter Name="dvid" Mode="In" Type="String" />
+            <Parameter Name="dsid" Mode="In" Type="String" />
+            <Parameter Name="year" Mode="In" Type="String" />
+            <Parameter Name="cropid" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="getCropMap" ReturnType="Collection(NationalAccountsModel.getCropMap_Result)">
+            <Parameter Name="cropid" Mode="In" Type="Int32" />
+            <Parameter Name="level" Mode="In" Type="Int32" />
+            <Parameter Name="id" Mode="In" Type="String" />
+            <Parameter Name="year" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getCrops" ReturnType="Collection(NationalAccountsModel.getCrops_Result)" />
+          <FunctionImport Name="WorldCropMap" ReturnType="Collection(NationalAccountsModel.WorldCropMap_Result)">
+            <Parameter Name="year" Mode="In" Type="String" />
+            <Parameter Name="crop" Mode="In" Type="Int32" />
+            <Parameter Name="country" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getCropHierarchyWise" ReturnType="Collection(NationalAccountsModel.getCropHierarchyWise_Result)">
+            <Parameter Name="cropid" Mode="In" Type="Int32" />
+            <Parameter Name="year" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getSimpleCards" ReturnType="Collection(NationalAccountsModel.getSimpleCards_Result)">
+            <Parameter Name="cropid" Mode="In" Type="Int32" />
+            <Parameter Name="year" Mode="In" Type="String" />
+            <Parameter Name="level" Mode="In" Type="Int32" />
+            <Parameter Name="id" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getGDP" ReturnType="Collection(NationalAccountsModel.getGDP_Result)">
+            <Parameter Name="months" Mode="In" Type="Int32" />
+            <Parameter Name="currency" Mode="In" Type="String" />
+            <Parameter Name="price" Mode="In" Type="String" />
+            <Parameter Name="output" Mode="In" Type="String" />
+            <Parameter Name="fyear" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="getGDPbreakdown" ReturnType="Collection(NationalAccountsModel.getGDPbreakdown_Result)">
+            <Parameter Name="months" Mode="In" Type="Int32" />
+            <Parameter Name="currency" Mode="In" Type="String" />
+            <Parameter Name="price" Mode="In" Type="String" />
+            <Parameter Name="output" Mode="In" Type="String" />
+            <Parameter Name="fyear" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="getGrowths" ReturnType="Collection(NationalAccountsModel.getGrowths_Result)">
+            <Parameter Name="months" Mode="In" Type="Int32" />
+            <Parameter Name="currency" Mode="In" Type="String" />
+            <Parameter Name="price" Mode="In" Type="String" />
+            <Parameter Name="from" Mode="In" Type="Int32" />
+            <Parameter Name="to" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="getTaxes" ReturnType="Collection(NationalAccountsModel.getTaxes_Result)">
+            <Parameter Name="year" Mode="In" Type="Int32" />
+            <Parameter Name="sector" Mode="In" Type="String" />
+            <Parameter Name="subsector" Mode="In" Type="String" />
+            <Parameter Name="title" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getWorldYear" ReturnType="Collection(NationalAccountsModel.getWorldYear_Result)">
+          <Parameter Name="c3" Mode="In" Type="String" />
+          </FunctionImport>
+          <FunctionImport Name="getWorldGDP" ReturnType="Collection(NationalAccountsModel.getWorldGDP_Result)">
+            <Parameter Name="year" Mode="In" Type="Int32" />
+            <Parameter Name="cc" Mode="In" Type="String" />
+            <Parameter Name="c3" Mode="In" Type="String" />
+            <Parameter Name="output" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <EntityType Name="d">
+          <Key>
+            <PropertyRef Name="dsid" />
+          </Key>
+          <Property Name="dvid" Type="String" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="dsid" Type="String" Nullable="false" MaxLength="3" FixedLength="true" Unicode="false" />
+          <Property Name="ds" Type="String" MaxLength="40" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="dv" Relationship="NationalAccountsModel.FK_ds_dv" FromRole="d" ToRole="dv" />
+        </EntityType>
+        <EntityType Name="dv">
+          <Key>
+            <PropertyRef Name="dvid" />
+          </Key>
+          <Property Name="pvid" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="dvid" Type="String" Nullable="false" MaxLength="2" FixedLength="true" Unicode="false" />
+          <Property Name="dv1" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ds" Relationship="NationalAccountsModel.FK_ds_dv" FromRole="dv" ToRole="d" />
+        </EntityType>
+        <EntityType Name="pv">
+          <Key>
+            <PropertyRef Name="pvid" />
+          </Key>
+          <Property Name="pvid" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="pv1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Year">
+          <Key>
+            <PropertyRef Name="fiscalyear" />
+          </Key>
+          <Property Name="fiscalyear" Type="String" Nullable="false" MaxLength="9" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_ds_dv">
+          <End Type="NationalAccountsModel.dv" Role="dv" Multiplicity="0..1" />
+          <End Type="NationalAccountsModel.d" Role="d" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="dv">
+              <PropertyRef Name="dvid" />
+            </Principal>
+            <Dependent Role="d">
+              <PropertyRef Name="dvid" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <ComplexType Name="getCropYearly_Result">
+          <Property Type="String" Name="fiscalyear" Nullable="true" MaxLength="9" />
+          <Property Type="Double" Name="production" Nullable="true" />
+          <Property Type="Double" Name="area" Nullable="true" />
+          <Property Type="Double" Name="yield" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getCards_Result">
+          <Property Type="Int32" Name="sr" Nullable="true" />
+          <Property Type="String" Name="title" Nullable="true" MaxLength="30" />
+          <Property Type="Double" Name="production" Nullable="true" />
+          <Property Type="Double" Name="area" Nullable="true" />
+          <Property Type="Double" Name="yield" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getCropdata_Result">
+          <Property Type="String" Name="id" Nullable="true" MaxLength="3" />
+          <Property Type="String" Name="name" Nullable="true" MaxLength="40" />
+          <Property Type="Single" Name="production" Nullable="true" />
+          <Property Type="Single" Name="yield" Nullable="true" />
+          <Property Type="Single" Name="area" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getCropMap_Result">
+          <Property Type="String" Name="id" Nullable="false" MaxLength="1" />
+          <Property Type="String" Name="name" Nullable="true" MaxLength="50" />
+          <Property Type="Double" Name="production" Nullable="true" />
+          <Property Type="Double" Name="area" Nullable="true" />
+          <Property Type="Double" Name="yield" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getCrops_Result">
+          <Property Type="Int32" Name="id" Nullable="false" />
+          <Property Type="String" Name="name" Nullable="true" MaxLength="100" />
+        </ComplexType>
+        <ComplexType Name="WorldCropMap_Result">
+          <Property Type="String" Name="CC" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="C2" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="C3" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="ISO" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="id" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="name" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="year" Nullable="true" MaxLength="10" />
+          <Property Type="Double" Name="production" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getCropHierarchyWise_Result">
+          <Property Type="String" Name="pvid" Nullable="false" MaxLength="1" />
+          <Property Type="String" Name="pv" Nullable="true" MaxLength="50" />
+          <Property Type="String" Name="dvid" Nullable="false" MaxLength="2" />
+          <Property Type="String" Name="dv" Nullable="false" MaxLength="30" />
+          <Property Type="String" Name="dsid" Nullable="false" MaxLength="3" />
+          <Property Type="String" Name="ds" Nullable="true" MaxLength="40" />
+          <Property Type="Double" Name="production" Nullable="true" />
+          <Property Type="Double" Name="area" Nullable="true" />
+          <Property Type="Double" Name="yield" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getSimpleCards_Result">
+          <Property Type="String" Name="title" Nullable="false" MaxLength="8" />
+          <Property Type="Int32" Name="id" Nullable="true" />
+          <Property Type="String" Name="year" Nullable="true" MaxLength="20" />
+          <Property Type="Double" Name="production" Nullable="true" />
+          <Property Type="Double" Name="area" Nullable="true" />
+          <Property Type="Double" Name="yield" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getGDP_Result">
+          <Property Type="Int32" Name="year" Nullable="true" />
+          <Property Type="Int32" Name="status" Nullable="true" />
+          <Property Type="Double" Name="value" Nullable="true" />
+          <Property Type="Int32" Name="q" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getGDPbreakdown_Result">
+          <Property Type="String" Name="category" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="sector" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="subsector" Nullable="true" MaxLength="100" />
+          <Property Type="Int32" Name="year" Nullable="true" />
+          <Property Type="Double" Name="value" Nullable="true" />
+          <Property Type="Int32" Name="status" Nullable="true" />
+          <Property Type="Int32" Name="q" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getGrowths_Result">
+          <Property Type="Int32" Name="Year" Nullable="true" />
+          <Property Type="Double" Name="GDP" Nullable="true" />
+          <Property Type="Double" Name="Agriculture" Nullable="true" />
+          <Property Type="Double" Name="Industry" Nullable="true" />
+          <Property Type="Double" Name="Service" Nullable="true" />
+          <Property Type="Double" Name="CPS" Nullable="true" />
+          <Property Type="String" Name="Govt" Nullable="true" MaxLength="255" />
+        </ComplexType>
+        <ComplexType Name="getTaxes_Result">
+          <Property Type="Int32" Name="id" Nullable="false" />
+          <Property Type="Int32" Name="fyear" Nullable="true" />
+          <Property Type="String" Name="sector" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="subsector" Nullable="true" MaxLength="100" />
+          <Property Type="String" Name="title" Nullable="true" MaxLength="100" />
+          <Property Type="Double" Name="value" Nullable="true" />
+          <Property Type="Int32" Name="status" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="getWorldYear_Result">
+          <Property Type="String" Name="name" Nullable="true" MaxLength="128" />
+          <Property Type="String" Name="value" Nullable="true" MaxLength="128" />
+        </ComplexType>
+        <ComplexType Name="getWorldGDP_Result">
+          <Property Type="String" Name="cc" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="c2" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="c3" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="iso" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="name" Nullable="true" MaxLength="255" />
+          <Property Type="String" Name="year" Nullable="true" MaxLength="128" />
+          <Property Type="Double" Name="value" Nullable="true" />
+        </ComplexType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="NationalAccountsModelStoreContainer" CdmEntityContainer="NationalAccountsEntities" >
+          <EntitySetMapping Name="ds">
+            <EntityTypeMapping TypeName="NationalAccountsModel.d">
+              <MappingFragment StoreEntitySet="ds">
+                <ScalarProperty Name="ds" ColumnName="ds" />
+                <ScalarProperty Name="dsid" ColumnName="dsid" />
+                <ScalarProperty Name="dvid" ColumnName="dvid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="dvs">
+            <EntityTypeMapping TypeName="NationalAccountsModel.dv">
+              <MappingFragment StoreEntitySet="dv">
+                <ScalarProperty Name="dv1" ColumnName="dv" />
+                <ScalarProperty Name="dvid" ColumnName="dvid" />
+                <ScalarProperty Name="pvid" ColumnName="pvid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="pvs">
+            <EntityTypeMapping TypeName="NationalAccountsModel.pv">
+              <MappingFragment StoreEntitySet="pv">
+                <ScalarProperty Name="pv1" ColumnName="pv" />
+                <ScalarProperty Name="pvid" ColumnName="pvid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Years">
+            <EntityTypeMapping TypeName="NationalAccountsModel.Year">
+              <MappingFragment StoreEntitySet="Year">
+                <ScalarProperty Name="fiscalyear" ColumnName="fiscalyear" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="getCropYearly" FunctionName="NationalAccountsModel.Store.getCropYearly">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getCropYearly_Result">
+                <ScalarProperty Name="fiscalyear" ColumnName="fiscalyear" />
+                <ScalarProperty Name="production" ColumnName="production" />
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="yield" ColumnName="yield" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getCards" FunctionName="NationalAccountsModel.Store.getCards">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getCards_Result">
+                <ScalarProperty Name="sr" ColumnName="sr" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="production" ColumnName="production" />
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="yield" ColumnName="yield" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getCropdata" FunctionName="NationalAccountsModel.Store.getCropdata">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getCropdata_Result">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="production" ColumnName="production" />
+                <ScalarProperty Name="yield" ColumnName="yield" />
+                <ScalarProperty Name="area" ColumnName="area" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getCropMap" FunctionName="NationalAccountsModel.Store.getCropMap">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getCropMap_Result">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="production" ColumnName="production" />
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="yield" ColumnName="yield" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getCrops" FunctionName="NationalAccountsModel.Store.getCrops">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getCrops_Result">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="WorldCropMap" FunctionName="NationalAccountsModel.Store.WorldCropMap">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.WorldCropMap_Result">
+                <ScalarProperty Name="CC" ColumnName="CC" />
+                <ScalarProperty Name="C2" ColumnName="C2" />
+                <ScalarProperty Name="C3" ColumnName="C3" />
+                <ScalarProperty Name="ISO" ColumnName="ISO" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="year" ColumnName="year" />
+                <ScalarProperty Name="production" ColumnName="production" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getCropHierarchyWise" FunctionName="NationalAccountsModel.Store.getCropHierarchyWise">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getCropHierarchyWise_Result">
+                <ScalarProperty Name="pvid" ColumnName="pvid" />
+                <ScalarProperty Name="pv" ColumnName="pv" />
+                <ScalarProperty Name="dvid" ColumnName="dvid" />
+                <ScalarProperty Name="dv" ColumnName="dv" />
+                <ScalarProperty Name="dsid" ColumnName="dsid" />
+                <ScalarProperty Name="ds" ColumnName="ds" />
+                <ScalarProperty Name="production" ColumnName="production" />
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="yield" ColumnName="yield" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getSimpleCards" FunctionName="NationalAccountsModel.Store.getSimpleCards">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getSimpleCards_Result">
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="year" ColumnName="year" />
+                <ScalarProperty Name="production" ColumnName="production" />
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="yield" ColumnName="yield" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getGDP" FunctionName="NationalAccountsModel.Store.getGDP">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getGDP_Result">
+                <ScalarProperty Name="year" ColumnName="year" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="q" ColumnName="q" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getGDPbreakdown" FunctionName="NationalAccountsModel.Store.getGDPbreakdown">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getGDPbreakdown_Result">
+                <ScalarProperty Name="category" ColumnName="category" />
+                <ScalarProperty Name="sector" ColumnName="sector" />
+                <ScalarProperty Name="subsector" ColumnName="subsector" />
+                <ScalarProperty Name="year" ColumnName="year" />
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="q" ColumnName="q" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getGrowths" FunctionName="NationalAccountsModel.Store.getGrowths">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getGrowths_Result">
+                <ScalarProperty Name="Year" ColumnName="Year" />
+                <ScalarProperty Name="GDP" ColumnName="GDP" />
+                <ScalarProperty Name="Agriculture" ColumnName="Agriculture" />
+                <ScalarProperty Name="Industry" ColumnName="Industry" />
+                <ScalarProperty Name="Service" ColumnName="Service" />
+                <ScalarProperty Name="CPS" ColumnName="CPS" />
+                <ScalarProperty Name="Govt" ColumnName="Govt" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getTaxes" FunctionName="NationalAccountsModel.Store.getTaxes">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getTaxes_Result">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="fyear" ColumnName="fyear" />
+                <ScalarProperty Name="sector" ColumnName="sector" />
+                <ScalarProperty Name="subsector" ColumnName="subsector" />
+                <ScalarProperty Name="title" ColumnName="title" />
+                <ScalarProperty Name="value" ColumnName="value" />
+                <ScalarProperty Name="status" ColumnName="status" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getWorldYear" FunctionName="NationalAccountsModel.Store.getWorldYear">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getWorldYear_Result">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="value" ColumnName="value" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="getWorldGDP" FunctionName="NationalAccountsModel.Store.getWorldGDP">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="NationalAccountsModel.getWorldGDP_Result">
+                <ScalarProperty Name="cc" ColumnName="cc" />
+                <ScalarProperty Name="c2" ColumnName="c2" />
+                <ScalarProperty Name="c3" ColumnName="c3" />
+                <ScalarProperty Name="iso" ColumnName="iso" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="year" ColumnName="year" />
+                <ScalarProperty Name="value" ColumnName="value" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

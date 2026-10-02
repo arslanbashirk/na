@@ -1,0 +1,96 @@
+﻿@{
+    Layout = null;
+    var page = (string)ViewBag.CropPage;
+    var titles = new System.Collections.Generic.Dictionary<string, string> {
+        { "overview", "Pakistan’s harvest." }, { "crop", "One crop. Every perspective." },
+        { "area", "The story of a place." }, { "compare", "A changing harvest." }
+    };
+    var scenes = new System.Collections.Generic.Dictionary<string, string> {
+        { "overview", "pakistan-harvest-banner.png" }, { "crop", "pakistan-crop-profile-banner.png" },
+        { "area", "pakistan-area-profile-banner.png" }, { "compare", "pakistan-rankings-banner.png" }
+    };
+    var sceneDescriptions = new System.Collections.Generic.Dictionary<string, string> {
+        { "overview", "Illustrative panorama of Pakistan’s irrigated fields and wheat harvest at sunset" },
+        { "crop", "Illustrative Pakistani harvest collection with grain, maize and raw cotton in woven baskets" },
+        { "area", "Illustrative aerial landscape of Pakistan’s irrigated fields, canals and rural settlements" },
+        { "compare", "Illustrative Pakistani agricultural field rows with farmers and a tractor at sunrise" }
+    };
+    var decks = new System.Collections.Generic.Dictionary<string, string> {
+        { "overview", "A richer view of the fields that feed a nation." },
+        { "crop", "From the field to the figures. Follow your crop." },
+        { "area", "Every place has a harvest worth understanding." },
+        { "compare", "Follow the leaders. Discover the changing harvest." }
+    };
+    var editions = new System.Collections.Generic.Dictionary<string, string> {
+        { "overview", "THE NATIONAL HARVEST" }, { "crop", "THE CROP COLLECTION" },
+        { "area", "THE REGIONAL LANDSCAPE" }, { "compare", "THE CHANGING HARVEST" }
+    };
+    var topics = new System.Collections.Generic.Dictionary<string, string[]> {
+        { "overview", new[] { "Production", "Land & yield", "Regional stories" } },
+        { "crop", new[] { "Crop footprint", "Yield patterns", "Historical trends" } },
+        { "area", new[] { "Crop mix", "Local leaders", "Regional context" } },
+        { "compare", new[] { "Rankings", "Year by year", "Shifting leaders" } }
+    };
+    var sceneUrl = Url.Content("~/Content/images/" + scenes[page]);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@titles[page] · Pakistan Crop Atlas</title>
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/vendor/leaflet/leaflet.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/crop-atlas.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/crop-theme.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/crop-editorial.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/crop-shell.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/crop-imagery.css")" />
+</head>
+<body id="page-top" class="crop-shell" data-page="@page" data-api="@Url.Action("Explore", "Crops")" data-root="@Url.Content("~/")" style="--page-harvest-image: url('@sceneUrl')">
+    @Html.Partial("_CropNavigation")
+    <main class="workspace" id="main-content">
+        @Html.Partial("_CropHeader")
+        <section class="hero harvest-hero"><img class="harvest-photo" src="@sceneUrl" alt="@sceneDescriptions[page]" fetchpriority="high" /><div class="hero-copy"><p class="eyebrow"><span class="hero-dot"></span> PAKISTAN · AGRICULTURE INTELLIGENCE</p><h1>@titles[page]</h1><p class="hero-deck">@decks[page]</p><p id="intro">Explore crop production, productivity and the places behind the numbers.</p><div class="hero-tags">@foreach (var topic in topics[page]) { <span>@topic</span> }</div></div><div class="hero-stamp"><small>@editions[page]</small><span id="hero-year">—</span><small>FISCAL YEAR · PAKISTAN</small></div></section>
+        <nav class="section-nav" aria-label="Sections on this page"><a href="#map-section">Explore the map</a><a href="#trends-section">Follow the trend</a><a href="#profile-section">Crop & place insights</a><a href="#data-section">Explore the numbers</a></nav>
+        <p class="crop-strip-caption">DISCOVER A CROP</p><div id="crop-strip" class="crop-strip" aria-label="Quick crop selection"></div>
+        <section class="filters" aria-label="Dashboard filters">
+            <label>Crop<select id="crop"></select></label><label>Fiscal year<select id="year"></select></label>
+            <label>Province<select id="province"><option value="0">All Pakistan</option></select></label>
+            <label>Division<select id="division"><option value="0">All divisions</option></select></label>
+            <label>District / reporting area<select id="district"><option value="0">All districts</option></select></label>
+            <button id="reset" class="quiet">Reset</button>
+        </section>
+        <div id="status" role="status" aria-live="polite">Loading crop observations…</div>
+        <section class="focus-bar" aria-label="Current geographic focus"><div><span class="focus-label">YOUR VIEW</span><div id="focus-trail"></div></div><button id="focus-back" class="quiet" type="button" hidden>← Back one step</button></section>
+        <section class="context"><svg class="selected-crop-icon" aria-hidden="true"><use id="selected-crop-symbol" href="@Url.Content("~/Content/crop-icons.svg#wheat")"></use></svg><h2 id="selection">Pakistan</h2><span id="coverage" class="pill"></span></section>
+        <section id="cards" class="cards" aria-label="Key indicators"></section>
+        <section id="insights" class="insights" aria-label="Insights"></section>
+        <section id="map-section" class="grid map-grid">
+            <article class="panel map-panel"><div class="panel-heading"><div><p class="eyebrow">THE GEOGRAPHY OF GROWTH</p><h2>One map, several perspectives</h2></div><select id="map-level" aria-label="Map geography"><option value="province">Provinces</option><option value="division">Divisions</option><option value="district">Districts</option></select></div>
+                <div class="map-controls"><div id="metrics" class="segmented"><button data-metric="Production" class="active">Production</button><button data-metric="Area">Area</button><button data-metric="Yield">Yield</button><button data-metric="Share">Share</button><button data-metric="Growth">YoY change</button></div><label class="check"><input id="labels" type="checkbox" /> Show names</label></div>
+                <div id="map" aria-label="Interactive crop map"></div><div class="map-foot"><span id="map-description">Click a place to focus this view.</span><div id="legend"></div></div>
+            </article>
+            <article class="panel ranking-panel"><div class="panel-heading"><div><p class="eyebrow">REGIONAL LEADERS</p><h2 id="ranking-title">Where production concentrates</h2></div><select id="rank-metric" aria-label="Ranking metric"><option value="Production">Production</option><option value="Area">Area</option><option value="Yield">Yield</option></select></div><div id="ranking-chart" class="chart tall"></div><div class="region-mix"><div><p class="eyebrow">PRODUCTION FOOTPRINT</p><h3>Share by province</h3></div><div id="region-chart"></div></div><p class="panel-note">Select a bar or slice to focus this page. Combined reporting areas remain combined.</p></article>
+        </section>
+        <section id="trends-section" class="grid">
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">THROUGH THE YEARS</p><h2>Area & production</h2></div></div><div id="trend-chart" class="chart"></div></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">PRODUCTIVITY</p><h2>Yield over time</h2></div></div><div id="yield-chart" class="chart"></div><p class="panel-note">Yield = total production ÷ total area. Missing inputs and zero area produce no yield value.</p></article>
+        </section>
+        <section id="profile-section" class="grid">
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">CROP COMPOSITION</p><h2>What this area grows</h2></div></div><div id="portfolio-chart" class="chart"></div><p class="panel-note">Area compares the reported cultivation values. It does not measure unique land or cropping intensity.</p></article>
+            <article class="panel"><div class="panel-heading"><div><p class="eyebrow">COMPARE PLACES</p><h2>Area versus productivity</h2></div></div><div id="scatter-chart" class="chart"></div><p class="panel-note">Each point represents a reporting area for the selected crop and year.</p></article>
+        </section>
+        <section id="race-section" class="panel"><div class="panel-heading"><div><p class="eyebrow">A CHANGING LEADERBOARD</p><h2>District ranking race</h2></div><div class="race-tools"><select id="race-metric" aria-label="Race metric"><option value="Production">Production</option><option value="Area">Area</option><option value="Yield">Yield</option></select><button id="play" class="button">▶ Play</button><label>Speed<select id="speed"><option value="1600">Normal</option><option value="800">Fast</option><option value="2500">Slow</option></select></label></div></div><div class="race-timeline"><input id="race-year" type="range" min="0" max="0" value="0" aria-label="Race fiscal year" /><strong id="race-label"></strong></div><div id="race-chart" class="chart tall"></div><p class="panel-note">Rankings use available observations in each year; reporting coverage and boundaries can change over time.</p></section>
+        <section id="data-section" class="panel"><div class="panel-heading"><div><p class="eyebrow">BEHIND THE VISUALS</p><h2 id="table-title">Reporting-area detail</h2></div><div class="table-tools"><input id="search" type="search" placeholder="Find a place or crop…" aria-label="Search table" /><select id="table-mode" aria-label="Table dataset"><option value="places">Reporting areas</option><option value="history">Historical totals</option><option value="crops">Crop composition</option></select></div></div><div class="table-scroll"><table id="data-table"><thead></thead><tbody></tbody></table></div><div class="table-footer"><span id="table-count"></span><button id="table-prev" class="quiet">← Previous</button><button id="table-next" class="quiet">Next →</button></div></section>
+        @Html.Partial("_CropFooter")
+    </main>
+    <script src="@Url.Content("~/Scripts/jquery-3.4.1.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/vendor/leaflet/leaflet.js")"></script>
+    <script src="@Url.Content("~/Scripts/vendor/highcharts/highcharts.js")"></script>
+    <script src="@Url.Content("~/Scripts/vendor/highcharts/exporting.js")"></script>
+    <script src="@Url.Content("~/Scripts/vendor/highcharts/export-data.js")"></script>
+    <script src="@Url.Content("~/Scripts/vendor/highcharts/accessibility.js")"></script>
+    <script src="@Url.Content("~/Scripts/crop-shell.js")"></script>
+    <script src="@Url.Content("~/Scripts/crop-atlas.js")"></script>
+</body>
+</html>

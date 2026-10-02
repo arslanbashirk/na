@@ -1,0 +1,908 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <style>
+        .input-group-addon {
+            width: 80px;
+            background-color: green;
+            color: white;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            text-align: center;
+            padding-top: 7px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .partition{
+            margin-top:15px;
+        }
+        .ntb {
+            margin-bottom: 2px;
+            border:solid 1px grey;
+            border-radius:4px;
+            font-size:16px;
+        }
+        .ntb.active {
+            background-color: blue;
+            color: white;
+        }
+        .form-select {
+            border-color: green;
+        }
+
+        .navbar-nav li, .navbar-brand {
+            padding-left: 10px;
+            padding-right: 10px;
+            background-color: rgba(0, 128, 128, 0.9);
+            margin: 3px;
+            border-radius: 5px;
+            border: solid 1px lightgreen;
+        }
+
+        tr.bg-primary {
+            background-color: black !important;
+            color: white;
+        }
+
+        .icon-cell {
+            text-align: center;
+            font-size: 20px;
+        }
+
+        #mytable th:nth-child(3), #mytable td:nth-child(3) {
+            display: none;
+        }
+
+        .chart {
+            height: 350px;
+            border: solid 1px grey;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+    </style>
+
+}
+
+<main>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="position:relative; height:415px">
+                    <img src="~/Content/images/pakecon.png" style="width:100%; height:410px; position:absolute; right:0px; left:0px; " />
+                    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
+                        <div class="container-fluid">
+                            @Html.ActionLink("QNA", "QNA", "GDP", new { area = "" }, new { @class = "navbar-brand" })
+                            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                                <ul class="navbar-nav flex-grow-1" style="font-weight:bold;">
+                                    <li>@Html.ActionLink("GDP", "Index", "GDP", new { area = "" }, new { @class = "nav-link" })</li>
+                                    <li>@Html.ActionLink("Global", "Global", "GDP", new { area = "" }, new { @class = "nav-link" })</li>
+                                    <li>@Html.ActionLink("Tax", "Index", "Tax", new { area = "" }, new { @class = "nav-link" })</li>
+                                    <li>@Html.ActionLink("Agriculture", "Home", "Crops", new { area = "" }, new { @class = "nav-link" })</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <img src="~/Content/images/logo.png" style="width:200px; height:auto; position:absolute; left:5px; top:60px;" />
+                    <div style="z-index: 1; position: absolute; right: 5px; left: 5px; padding: 2px 10px; bottom: 20px; background: linear-gradient(to right, teal, #808080); opacity: 80%; border-radius: 5px; ">
+                        <h2 style="color:white; font-weight:bold;">Gross Domestic Product of Pakistan</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 rp" style="margin-bottom:7px;">
+                <div class="partition">
+                    <div style="float:left;">
+                        <span style="font-size:16px; color:black; font-weight:bold;">Gross Domest Product (GDP) Overview</span>
+                    </div>
+                    <div style="float:right;">
+                        <div id="output" style="float:right;">
+                            <button type="button" class="ntb active" data-id="GDP">GDP</button>
+                            <button type="button" class="ntb" data-id="Agriculture">Agriculture</button>
+                            <button type="button" class="ntb" data-id="Industry">Industry</button>
+                            <button type="button" class="ntb" data-id="Service">Service</button>
+                            <button type="button" class="ntb" data-id="Taxes">Taxes</button>
+                        </div>
+                    </div>
+                    <div style="clear:both;" class="chart" id="chart1"></div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="chart" id="chart2"></div>
+            </div>
+            <div class="col-lg-8">
+                <div class="chart" id="chart21"></div>
+            </div>
+            
+            
+        </div>
+        <div class="col-lg-12">
+            <div style="position:relative; margin-top:15px;">
+                <span style="font-size:16px; color:black; font-weight:bold;">GDP Heat Table</span>
+                <div style="position:absolute; right:0px; top:0px;">
+                    <select id="heattype">
+                        <option value="row">Row  Heat Table</option>
+                        <option value="column">Column Heat Table</option>
+                    </select>
+                    <select id="heatvalue">
+                        <option value="share">Share</option>
+                        <option value="change">YoY Change (%)</option>
+                        <option value="contribution">Contribution</option>
+                    </select>
+                </div>
+                <div id="mytable" style="margin-top:15px; overflow-x:auto; white-space:nowrap;">
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+<script src="https://code.highcharts.com/modules/sunburst.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script>
+    $(document).ready(function () {
+        getGDP();
+        OUTPUT = [];
+        OUTTABLE = [];
+        GDPDATA = [];
+        DATA = [];
+        const ICONS = {
+            // Major Sectors
+            "Agriculture": "fa-leaf",
+            "Industry": "fa-cogs",
+            "Service": "fa-briefcase",
+
+            // Agriculture Subsectors
+            "Crops": "fa-seedling",
+            "Fishing": "fa-fish",
+            "Forestry": "fa-tree",
+            "Livestock": "fa-paw",
+
+            // Industry Subsectors
+            "Construction": "fa-tools",
+            "Electricity, gas and water": "fa-bolt",
+            "Manufacturing": "fa-industry",
+            "Mining & Quarrying": "fa-hammer",
+
+            // Services Subsectors
+            "Hotels & Restaurants": "fa-utensils",
+            "Education": "fa-graduation-cap",
+            "Finance & Insurance Activities": "fa-chart-line",
+            "Human Health and Social Work": "fa-user-nurse",
+            "Information and Communication": "fa-wifi",
+            "Other Private Services": "fa-box",
+            "General Government": "fa-landmark",
+            "Real Estate (Ownership)": "fa-building",
+            "Transport& Storage": "fa-truck",
+            "Wholesale & Retail Trade": "fa-ship"
+        };
+
+        $("#output .ntb").on('click', function () {
+            $('#output .ntb').removeClass("active");
+            $(this).addClass("active");
+            getGDP();
+            var output = $(this).attr('data-id');
+            if (output == 'Agriculture' || output == 'Service' || output == 'Industry') {
+                displayArea(output);
+            }
+            else {
+                displayArea(null);
+            }
+        });
+        getBreakdown();
+        function getGDP() {
+            var output = $('#output .ntb.active').attr('data-id');
+            $.get("/GDP/getGDP/?months=3&currency=pkr&price=constant&output=" + output + "&year=0", function (result) {
+                timeseries(result.data, output);
+            });
+        }
+
+        function getBreakdown() {
+            var output = $('#output .ntb.active').attr('data-id');
+            $.get("/GDP/getGDPbreakdown/?months=3&currency=pkr&price=constant&output=" + output + "&year=0", function (result) {
+                DATA = response = result.data;
+                displayPie(response[response.length - 1].year, response[response.length - 1].q);
+                OUTPUT = buildGDPHierarchy(response);
+                displayArea(null);
+                displayTable();
+            });
+        }
+
+        function timeseries(data, title) {
+            const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+            const years = [...new Set(data.map(d => d.year))];
+
+            // Create a series for each quarter
+            const series = [1, 2, 3, 4].map(q => ({
+                name: 'Q' + q,
+                data: years.map(year => {
+                    const match = data.find(d => d.year === year && d.q === q);
+                    return match ? Math.round(match.value / 1000) : 0;
+                }),
+                color: getQuarterColor(q)
+            }));
+
+            // Yearly total and YoY %
+            const yearlyTotals = years.map(year =>
+                data.filter(d => d.year === year).reduce((sum, d) => sum + d.value, 0)
+            );
+
+            const yoyGrowth = yearlyTotals.map((val, i) => {
+                if (i === 0 || yearlyTotals[i - 1] === 0) return null;
+                const prev = yearlyTotals[i - 1];
+                return +(((val - prev) / prev) * 100).toFixed(2);
+            });
+
+            // Add line series to existing series array
+            series.push({
+                type: 'line',
+                name: 'YoY Growth (%)',
+                yAxis: 1,
+                data: yoyGrowth,
+                tooltip: { valueSuffix: '%' },
+                marker: { enabled: true },
+                color: 'red',
+                dashStyle: 'ShortDash'
+            });
+
+            Highcharts.chart('chart1', {
+                chart: {
+                    zoomType: 'xy',
+                    type: 'column'
+                },
+                title: {
+                    text: 'Quarterly Data by Year - ' + title
+                },
+                xAxis: {
+                    categories: years.map(String),
+                    title: { text: 'Financial Year' }
+                },
+                yAxis: [
+                    {
+                        title: { text: 'Billion PKR' }
+                    },
+                    {
+                        title: { text: 'YoY Growth (%)' },
+                        labels: { format: '{value}%', style: { color: 'red' } },
+                        opposite: true
+                    }
+                ],
+
+                plotOptions: {
+                    column: {
+                        grouping: true,
+                        borderWidth: 0,
+                        point: {
+                            events: {
+                                click: function () {
+                                    const year = this.category; // this.category is the xAxis label (year)
+                                    const quarter = this.series.name.replace('Q', ''); // extract q from series name
+                                    displayPie(parseInt(year), parseInt(quarter));
+                                }
+                            }
+                        }
+                    }
+                },
+                legend: {
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                },
+                tooltip: {
+                    shared: true
+                },
+                series: series
+            });
+        }
+
+
+        function getQuarterColor(q) {
+            switch (q) {
+                case 1: return 'rgba(60, 179, 113, 0.8)';  // medium green (medium sea green)
+                case 2: return 'rgba(34, 139, 34, 0.8)';   // forest green
+                case 3: return 'rgba(0, 100, 0, 0.8)';     // dark green
+                case 4: return 'darkgreen';     // dark green
+                default: return 'black';
+            }
+        }
+
+        function displayPie(year, quarter) {
+            const sectorTotals = {};
+
+            $.each(DATA, function (index, item) {
+                if (item.year === year && item.q === quarter) {
+                    if (!sectorTotals[item.sector]) {
+                        sectorTotals[item.sector] = 0;
+                    }
+                    sectorTotals[item.sector] += item.value;
+                }
+            });
+            const result = Object.keys(sectorTotals).map(sector => {
+                return { name: sector, y: sectorTotals[sector] };
+            });
+            const sortedResult = result.sort((a, b) => b.y - a.y);
+
+
+            Highcharts.chart('chart2', {
+                chart: {
+                    type: 'pie',
+                    options3d: {
+                        enabled: true,
+                        alpha: 45
+                    },
+
+                    events: {
+                        load: function () {
+                            const chart = this;
+                            document.addEventListener('click', function (e) {
+                                const isSlice = e.target.closest('.highcharts-point');
+                                if (!isSlice && e.target.closest('#chart2')) {
+                                    displayArea(null);
+                                }
+                            });
+                        }
+                    }
+                },
+                title: {
+                    text: 'GDP Share FY' + year + " [Q" + quarter+"]",
+                },
+                subtitle: {
+                    text: 'click any sector (to change area chart)',
+                },
+                credits: {
+                    useHTML: true,
+                    text: "<p style='color:black; font-size:12px;'>Source: National Accounts, PBS, Credit: <a style='color:green; font-weight:bold; font-size:11px' href='http://www.pbs.gov.pk'>pbs.gov.pk</a></p>"
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        innerSize: 60,
+                        depth: 45,
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b><br>{point.percentage:.1f}%',
+                            distance: 20
+                        },
+                        showInLegend: false,
+                        point: {
+                            events: {
+                                click: function () {
+                                    displayArea(this.name); // this.name holds the category name
+                                }
+                            }
+                        }
+                    }
+                },
+                series: [{
+                    name: 'GDP By Sector',
+                    data: sortedResult // each item must have a 'name' and 'y' value
+                }]
+            });
+        }
+
+
+
+
+
+        function buildGDPHierarchy(data) {
+            // Create sorted array of unique time keys like "2025Q1", "2025Q2", ...
+            const timeKeys = [...new Set(data.map(d => `${d.year}Q${d.q}`))].sort((a, b) => {
+                const [yearA, qA] = a.split('Q').map(Number);
+                const [yearB, qB] = b.split('Q').map(Number);
+                return yearA === yearB ? qA - qB : yearA - yearB;
+            });
+
+            const totalMap = {}; // total GDP by timeKey
+            const sectorMap = {};
+
+            // 1. Calculate total GDP per timeKey
+            for (const key of timeKeys) {
+                totalMap[key] = data
+                    .filter(d => `${d.year}Q${d.q}` === key)
+                    .reduce((sum, d) => sum + d.value, 0);
+            }
+
+            // 2. Group data into sector > subsector > timeKey
+            for (const item of data) {
+                const { sector, subsector, year, q, value } = item;
+                const timeKey = `${year}Q${q}`;
+
+                if (!sectorMap[sector]) {
+                    sectorMap[sector] = { sector, timeSeries: {}, subsectors: {} };
+                }
+
+                // Sector total per timeKey
+                sectorMap[sector].timeSeries[timeKey] = (sectorMap[sector].timeSeries[timeKey] || 0) + value;
+
+                // Subsector total per timeKey
+                if (!sectorMap[sector].subsectors[subsector]) {
+                    sectorMap[sector].subsectors[subsector] = { name: subsector, timeSeries: {} };
+                }
+                sectorMap[sector].subsectors[subsector].timeSeries[timeKey] =
+                    (sectorMap[sector].subsectors[subsector].timeSeries[timeKey] || 0) + value;
+            }
+
+            // 3. Convert to final structured array
+            const output = [];
+
+            for (const sectorName in sectorMap) {
+                const sectorObj = sectorMap[sectorName];
+                const sectorData = [];
+
+                for (const key of timeKeys) {
+                    const value = sectorObj.timeSeries[key] || 0;
+                    const share = totalMap[key] ? +(value / totalMap[key] * 100).toFixed(2) : 0;
+                    sectorData.push({ year: key, value, share, change: null, contribution: null });
+                }
+
+                for (let i = 1; i < sectorData.length; i++) {
+                    const curr = sectorData[i];
+                    const prev = sectorData[i - 1];
+                    if (prev.value > 0) {
+                        curr.change = +(((curr.value - prev.value) / prev.value) * 100).toFixed(2);
+                    }
+                    curr.contribution = +((curr.change * curr.share) / 100).toFixed(2);
+                }
+
+                // Subsector data
+                const subsectors = [];
+
+                for (const subName in sectorObj.subsectors) {
+                    const subObj = sectorObj.subsectors[subName];
+                    const subData = [];
+
+                    for (const key of timeKeys) {
+                        const value = subObj.timeSeries[key] || 0;
+                        const share = totalMap[key] ? +(value / totalMap[key] * 100).toFixed(2) : 0;
+                        subData.push({ year: key, value, share, change: null, contribution: null });
+                    }
+
+                    for (let i = 1; i < subData.length; i++) {
+                        const curr = subData[i];
+                        const prev = subData[i - 1];
+                        if (prev.value > 0) {
+                            curr.change = +(((curr.value - prev.value) / prev.value) * 100).toFixed(2);
+                        }
+                        curr.contribution = +((curr.change * curr.share) / 100).toFixed(2);
+                    }
+
+                    subsectors.push({ name: subName, data: subData });
+                }
+
+                output.push({
+                    name: sectorName,
+                    data: sectorData,
+                    subsectors
+                });
+            }
+
+            return output;
+        }
+
+
+
+        function displayArea(s) {
+            let series;
+            if (s != null) {
+                const sector = OUTPUT.find(item => item.name === s);
+                series = sector.subsectors
+                    // Step 1: sort by total share (or average share)
+                    .slice() // avoid mutating original
+                    .sort((a, b) => {
+                        const totalA = a.data.reduce((sum, item) => sum + item.share, 0);
+                        const totalB = b.data.reduce((sum, item) => sum + item.share, 0);
+                        return totalB - totalA; // ascending: smaller on top
+                    })
+                    // Step 2: map to Highcharts format
+                    .map(set => ({
+                        name: set.name,
+                        data: set.data.map(item => [item.year, item.share])
+                    }));
+            }
+            else {
+                series = OUTPUT
+                    // Step 1: sort by total share (or average share)
+                    .slice() // avoid mutating original
+                    .sort((a, b) => {
+                        const totalA = a.data.reduce((sum, item) => sum + item.share, 0);
+                        const totalB = b.data.reduce((sum, item) => sum + item.share, 0);
+                        return totalB - totalA; // ascending: smaller on top
+                    })
+                    // Step 2: map to Highcharts format
+                    .map(set => ({
+                        name: set.name,
+                        data: set.data.map(item => [item.year, item.share])
+                    }));
+            }
+
+
+            // Step 4: Draw area chart
+            Highcharts.chart('chart21', {
+                chart: {
+                    type: 'area'
+                },
+                title: {
+                    text: 'Historic Series of Sectorial Share (% of GDP)'
+                },
+                xAxis: {
+                    title: { text: 'Year' },
+                    allowDecimals: false
+                },
+                yAxis: {
+                    title: {
+                        text: 'Percentage Share'
+                    },
+                    labels: {
+                        format: '{value}%'
+                    }
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y:.1f}%</b><br/>',
+                    shared: true
+                },
+                plotOptions: {
+                    area: {
+                        marker: {
+                            enabled: false
+                        }
+                    }
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'left',
+                    verticalAlign: 'middle',
+                    floating: false,
+                    borderWidth: 1,
+                    backgroundColor: '#ffffff',
+                    itemMarginTop: 5,
+                    itemMarginBottom: 5
+                },
+                credits: {
+                    useHTML: true,
+                    text: "<p style='color:black; font-size:12px;'>Source: National Accounts, PBS, Credit: <a style='color:green; font-weight:bold; font-size:11px' href='http://www.pbs.gov.pk'>pbs.gov.pk</a></p>"
+                },
+                series: series
+            });
+        }
+
+
+
+
+        function breakdown(dataset, year) {
+            Highcharts.chart('chart4', {
+
+                chart: {
+                    height: '100%'
+                },
+
+                credits: {
+                    useHTML: true,
+                    text: "<p style='color:black; font-size:12px;'>Soruce: National Accounts, PBS,  Credit: <a style='color:green; font-weight:bold; font-size:11px' href='http://www.pbs.gov.pk'>pbs.gov.pk</a></p>"
+                },
+                // Let the center circle be transparent
+                colors: ['transparent'].concat(Highcharts.getOptions().colors),
+
+                title: {
+                    text: 'GDP Distribution FY' + year
+                },
+
+                series: [{
+                    type: 'sunburst',
+                    data: dataset,
+                    name: 'Root',
+                    allowDrillToNode: true,
+                    borderRadius: 3,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        format: '{point.name}',
+                        filter: {
+                            property: 'innerArcLength',
+                            operator: '>',
+                            value: 16
+                        }
+                    },
+                    levels: [{
+                        level: 1,
+                        levelIsConstant: false,
+                        dataLabels: {
+                            filter: {
+                                property: 'outerArcLength',
+                                operator: '>',
+                                value: 64
+                            }
+                        }
+                    }, {
+                        level: 2,
+                        colorByPoint: true
+                    },
+                    {
+                        level: 3,
+                        colorVariation: {
+                            key: 'brightness',
+                            to: -0.5
+                        }
+                    }, {
+                        level: 4,
+                        colorVariation: {
+                            key: 'brightness',
+                            to: 0.5
+                        }
+                    }]
+
+                }],
+
+                tooltip: {
+                    headerFormat: '',
+                    pointFormat: 'The GDP of <b>{point.name}</b> is <b>{point.value}</b>'
+                }
+            });
+        }
+
+        function linechart(data) {
+            Highcharts.chart('chart3', {
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: 'Per Capita Income'
+                },
+                credits: {
+                    useHTML: true,
+                    text: "<p style='color:black; font-size:12px;'>Soruce: National Accounts, PBS,  Credit: <a style='color:green; font-weight:bold; font-size:11px' href='http://www.pbs.gov.pk'>pbs.gov.pk</a></p>"
+                },
+                xAxis: {
+                    categories: data.map(x => x.Year.substring(0, 4))
+                },
+                yAxis: {
+                    title: {
+                        text: 'Thousand PKR'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: false
+                    }
+                },
+                series: [{
+                    name: 'Avg Income',
+                    data: data.map(x => +(x.PCI / 1000).toFixed(2))
+                }]
+            });
+        }
+
+        function displayTable(field = 'share') {
+            const output = OUTPUT;
+            console.log(output);
+            const flatOutput = OUTPUT;
+            const allYearsSet = new Set();
+
+            flatOutput.forEach(sector => {
+                sector.data.forEach(d => allYearsSet.add(d.year));
+                sector.subsectors.forEach(sub => {
+                    sub.data.forEach(d => allYearsSet.add(d.year));
+                });
+            });
+
+            const allYears = Array.from(allYearsSet).sort();
+
+            const rows = [];
+
+            flatOutput.forEach(sector => {
+                // Sector row
+                const sectorYearMap = {};
+                sector.data.forEach(d => {
+                    sectorYearMap[d.year] = (d[field] !== undefined) ? d[field] : null;
+                });
+                const sectorValues = allYears.map(year => sectorYearMap[year] ?? null);
+                rows.push({ name: sector.name, shares: sectorValues, isSubsector: false });
+
+                // Subsectors rows
+                sector.subsectors.forEach(sub => {
+                    const subYearMap = {};
+                    sub.data.forEach(d => {
+                        subYearMap[d.year] = (d[field] !== undefined) ? d[field] : null;
+                    });
+                    const subValues = allYears.map(year => subYearMap[year] ?? null);
+                    rows.push({ name: sub.name, shares: subValues, isSubsector: true });
+                });
+            });
+            const $table = renderTable(allYears, rows);
+            $('#mytable').empty().append($table);
+            applyHeatmap($('#mytable'), { orientation: $("#heattype").val() });
+        }
+
+
+        $("#heattype").on('change', function () {
+            applyHeatmap($('#mytable'), { orientation: $(this).val() });
+        });
+        $("#heatvalue").on('change', function () {
+            displayTable($(this).val());
+        });
+        function renderTable(allYears, rows) {
+            // Create table elements
+            const $table = $('<table class="table table-bordered">').attr({ border: 1, cellpadding: 5, cellspacing: 0 }).css('border-collapse', 'collapse');
+            const $thead = $('<thead>');
+            const $tbody = $('<tbody>');
+
+            // Header row
+            const $headerRow = $('<tr  class="bg-primary">');
+            $headerRow.append($('<th>').text('Icon'));
+            $headerRow.append($('<th>').text('Sector'));
+            allYears.forEach(year => {
+                $headerRow.append($('<th>').text(year));
+            });
+            $thead.append($headerRow);
+
+            // Data rows
+            rows.forEach(row => {
+                const $tr = $('<tr>');
+                const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+                $tr.append(`<td class="icon-cell"><i class="fas ${ICONS[row.name]}" style="color:${randomColor};"></i></td>`);
+
+                //$tr.append($('<td>').text(ICONS[row.name]));
+                const $nameTd = $('<td>').text(row.name)
+                    .css('padding-left', row.isSubsector ? '20px' : '5px')
+                    .css('font-weight', row.isSubsector ? 'normal' : 'bold');
+                $tr.append($nameTd);
+
+                row.shares.forEach(share => {
+                    let val = share !== null ? share.toFixed(2) : '-';
+                    $tr.append($('<td>').text(val));
+                });
+
+                $tbody.append($tr);
+            });
+
+            $table.append($thead, $tbody);
+            return $table;
+        }
+
+
+
+        function applyHeatmap($table, options = { orientation: 'row', colorMin: '#ffffff', colorMax: '#007700' }) {
+            const { orientation, colorMin, colorMax } = options;
+
+            function interpolateColor(min, max, value) {
+                if (value === 0 || value === null || value === undefined) {
+                    return '#ffffff';
+                }
+                const clamp = (num, minVal, maxVal) => Math.min(Math.max(num, minVal), maxVal);
+                const hexToRgb = hex => {
+                    if (typeof hex !== 'string') return [255, 255, 255]; // default white
+                    if (hex.startsWith('#')) hex = hex.slice(1);
+                    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+                    const result = hex.match(/\w\w/g);
+                    return result ? result.map(x => parseInt(x, 16)) : [255, 255, 255];
+                };
+
+                const rgbToHex = rgb => '#' + rgb.map(x => x.toString(16).padStart(2, '0')).join('');
+
+                const mixColors = (color1, color2, factor) => {
+                    const c1 = hexToRgb(color1);
+                    const c2 = hexToRgb(color2);
+                    const result = c1.map((c, i) => Math.round(c + factor * (c2[i] - c)));
+                    return rgbToHex(result);
+                };
+
+                if (value === 0 || value === null || value === undefined) {
+                    return '#ffffff';
+                }
+
+                if (value > 0) {
+                    if (max <= min) {
+                        return '#007700';
+                    }
+                    const factor = clamp((value - min) / (max - min), 0, 1);
+                    return mixColors('#ffffff', '#007700', factor);
+                } else if (value < 0) {
+                    if (min >= max) {
+                        return '#ff0000';
+                    }
+                    const factor = clamp((value - max) / (min - max), 0, 1);
+                    return mixColors('#ffffff', '#ff0000', factor);
+                }
+            }
+
+
+
+            function getContrastYIQ(hexColor) {
+                if (hexColor.startsWith('#')) hexColor = hexColor.slice(1);
+                if (hexColor.length === 3) hexColor = hexColor.split('').map(c => c + c).join('');
+                if (hexColor.length !== 6) return '#000000';
+                const r = parseInt(hexColor.substr(0, 2), 16);
+                const g = parseInt(hexColor.substr(2, 2), 16);
+                const b = parseInt(hexColor.substr(4, 2), 16);
+                const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+                return yiq >= 128 ? '#000000' : '#ffffff';
+            }
+
+            function parseCellValue($cell) {
+                const text = $cell.text().replace(/,/g, '').trim();
+                const num = parseFloat(text);
+                return isNaN(num) ? null : num;
+            }
+
+            if (orientation === 'row') {
+                // Iterate each row (skip header row if present)
+                $table.find('tbody tr').each(function () {
+                    const $cells = $(this).find('td').not(':first'); // assuming first column is label
+                    const values = [];
+
+                    $cells.each(function () {
+                        values.push(parseCellValue($(this)));
+                    });
+
+                    // Filter valid numbers
+                    const validValues = values.filter(v => v !== null);
+                    if (validValues.length === 0) return; // skip if no valid numbers
+
+                    const min = Math.min(...validValues);
+                    const max = Math.max(...validValues);
+
+                    $cells.each(function (i) {
+                        const val = values[i];
+                        if (val === null) {
+                            $(this).css('background-color', '');
+                            return;
+                        }
+                        const bgColor = interpolateColor(min, max, val);
+                        const textColor = getContrastYIQ(bgColor);
+                        $(this).css({ 'background-color': bgColor, 'color': textColor });
+                    });
+                });
+            } else if (orientation === 'column') {
+                // Iterate each column (skip first column if it’s label)
+                const $rows = $table.find('tbody tr');
+                const colCount = $rows.first().find('td').length;
+
+                for (let colIndex = 1; colIndex < colCount; colIndex++) { // assuming first col label
+                    const values = [];
+                    $rows.each(function () {
+                        const $cell = $(this).find('td').eq(colIndex);
+                        values.push(parseCellValue($cell));
+                    });
+
+                    const validValues = values.filter(v => v !== null);
+                    if (validValues.length === 0) continue;
+
+                    const min = Math.min(...validValues);
+                    const max = Math.max(...validValues);
+
+                    $rows.each(function (rowIndex) {
+                        const val = values[rowIndex];
+                        const $cell = $(this).find('td').eq(colIndex);
+                        if (val === null) {
+                            $cell.css('background-color', '');
+                            return;
+                        }
+                        const bgColor = interpolateColor(min, max, val);
+                        const textColor = getContrastYIQ(bgColor);
+                        $cell.css({ 'background-color': bgColor, 'color': textColor });
+                    });
+                }
+            } else {
+                console.warn('Invalid orientation option. Use "row" or "column".');
+            }
+        }
+
+        
+        
+    });
+
+
+</script>

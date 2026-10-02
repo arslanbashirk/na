@@ -1,0 +1,620 @@
+﻿
+@{
+    ViewBag.Title = "Goods";
+    Layout = "~/Views/Shared/_LayoutDashboard.cshtml";
+    int luy = (int)ViewData["luy"];
+    int lum = (int)ViewData["lum"];
+    string[] mm = { null, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+    <link rel="stylesheet" type="text/css" href="//github.com/downloads/lafeber/world-flags-sprite/flags32.css" />
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        #chart3 {
+            height: 580px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .highcharts-tooltip > span {
+            padding: 10px;
+            white-space: normal !important;
+            width: 200px;
+        }
+
+        .loading {
+            margin-top: 10em;
+            text-align: center;
+            color: gray;
+        }
+
+        .f32 .flag {
+            vertical-align: middle !important;
+        }
+    </style>
+}
+
+<div class="row">
+    <div class="col-xs-6 rp">
+        <h2 style="margin-top:10px;  font-weight:bold; color:black">World Map of Pakistan Trade Partners</h2>
+    </div>
+    <div class="col-xs-6 rp">
+        <p style="text-align:right; margin-bottom:0px; padding-top:10px;">
+            <button class="mbt btn btn-primary active oxx">Overall Trade</button>
+            <button class="mbt btn btn-success exx">Exports</button>
+            <button class="mbt btn btn-success imx">Imports</button>
+            <button class="mbt btn btn-success bxx">Trade Balance</button>
+        </p>
+    </div>
+</div>
+<div class="row cards">
+    <div class="col-xs-12 rp">
+        <div id="chart3">Looading....!</div>
+    </div>
+</div>
+
+
+
+<script src="~/assets/scripts/jquery-3.4.1.js"></script>
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+<script src="https://code.highcharts.com/maps/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/maps/modules/offline-exporting.js"></script>
+<script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+<script src="~/assets/scripts/main.js"></script>
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            var TITLE = "";
+            var STAT = [];
+            var YYY = $("#year").val();
+            var MMM = $("#qmonth").val();
+            var YYT = $("#year option:selected").html();
+            var MMT = $("#qmonth option:selected").html();
+            var ICOLOR = "#f54747";
+            var ECOLOR = "#229a47";
+            var BASE = JSON.parse('@Html.Raw(Json.Encode(ViewData["base"]))');
+            var luy = JSON.parse('@Html.Raw(Json.Encode(ViewData["luy"]))');
+            var lum = JSON.parse('@Html.Raw(Json.Encode(ViewData["lum"]))');
+
+            var CD3 = [];
+            //var CD4 = [];
+
+            var MONTHS = [null, "January", "February", "March", "April", "May", "June", 'July', "August", "September", "October", "November", "December"];
+            //month select list upda
+            $("#year").change(function () {
+                YYY = $(this).val();
+                YYT = $("#year option:selected").html();
+                var str = "<option value='0'>All Months</option>";
+                if ($(this).val() < 100) {
+                    for (var i = 1; i < MONTHS.length; i++) {
+                        if (i == 1 || i == 4 || i == 7 || i == 10) {
+                            var q = Math.round((i / 3) + 1);
+                            str += "<option value='" + i + '' + (i + 2) + "'>Quarter " + q + "</option>";
+                        }
+                        str += "<option value='" + i + "'>" + MONTHS[i] + "</option>";
+                    }
+                }
+                else {
+                    var e = 12;
+                    for (var s = 7; s <= e; s++) {
+                        if (s == 1 || s == 4 || s == 7 || s == 10) {
+                            var q = Math.round(4 - (s % 4));
+                            str += "<option value='" + s + '' + (s + 2) + "'>Quarter " + q + "</option>";
+                        }
+                        str += "<option value='" + s + "'>" + MONTHS[s] + "</option>";
+                        if (s == 12) {
+                            s = 0; e = 6;
+                        }
+                    }
+                }
+                $("#qmonth").html(str);
+                $("#qmonth").change();
+            });
+
+
+            $("#qmonth, #currency").on("change", function () {
+                MMM = $("#qmonth").val();
+                MMT = $("#qmonth option:selected").html();
+                getTitle();
+                request_stat();
+                request_Chart_03();
+
+            });
+            IND = " Overall ";
+            $(".mbt").on("click", function () {
+                var me = $(this);
+                $(".mbt.active").removeClass("btn-primary");
+                $(".mbt.active").addClass("btn-success");
+                $(".mbt").removeClass("active");
+                me.removeClass("btn-success");
+                me.addClass("btn-primary");
+                me.addClass("active");
+                if (me.hasClass("oxx")) {
+                    IND = " Overall ";
+                    Chart_03_Map();
+                }
+                else if(me.hasClass("exx")){
+                    IND = " Exports ";
+                    Chart_03_Map_ind();
+                }
+                else if (me.hasClass("imx")){
+                    IND = " Imports ";
+                    Chart_03_Map_ind();
+                }
+                else if (me.hasClass("bxx")){
+                    IND = " Trade Balance ";
+                    Chart_03_Map2();
+                }
+            });
+
+           
+
+            function request_Chart_03() {
+                var data = { Group: "", Month: MMM, Year: YYY, ContinentCode:0 };
+                $.ajax({
+                    url: BASE + "Data/GetMapByCountry",
+                    type: "POST",
+                    data: data,
+                    success: function (result) {
+                        CD3 = result.data;
+                        var me = $(".mbt.active");
+                        if (me.hasClass("oxx")) {
+                            IND = " Overall ";
+                            Chart_03_Map();
+                        }
+                        else if (me.hasClass("exx")) {
+                            IND = " Exports ";
+                            Chart_03_Map_ind();
+                        }
+                        else if (me.hasClass("imx")) {
+                            IND = " Imports ";
+                            Chart_03_Map_ind();
+                        }
+                        else if (me.hasClass("bxx")) {
+                            IND = " Trade Balance ";
+                            Chart_03_Map2();
+                        }
+                    }
+                });
+            }
+            getTitle();
+            request_Chart_03();
+
+            function getTitle() {
+                if (MMM == 0) {
+                    TITLE = YYT;
+                }
+                else if (MMM <= 6) {
+                    TITLE = MMT.substr(0, 3) + ", " + YYT.substr(YYT.length - 4, 4);
+                }
+                else if (MMM <= 12) {
+                    TITLE = MMT.substr(0, 3) + ", " + YYT.substr(3, 4);
+                }
+                else {
+                    TITLE = MMT.charAt(0) + "" + MMT.charAt(8) + ", " + YYT.substr(3, 4);
+                }
+            }
+
+
+            $(".colbtn").click(function () {
+                if ($(this).hasClass("is-active")) {
+                    $("#iconid").show();
+                }
+                else {
+                    $("#iconid").hide();
+                }
+            });
+
+
+            function Chart_03_Map() {
+
+                var data = [];
+
+                for (var i = 0; i < CD3.length; i++) {
+                    if (CD3[i].ID == "pak") {
+                        continue;
+                    }
+                    data.push({
+                        code: CD3[i].ID.toUpperCase(), value: +(((CD3[i].ImportsInDollars / 1000000) + (CD3[i].ExportsInDollars / 1000000)).toFixed(3)), name: CD3[i].Name, imports: +((CD3[i].ImportsInDollars / 1000000).toFixed(3)), exports: +((CD3[i].ExportsInDollars / 1000000).toFixed(3))
+                    });
+                }
+                function pointClick() {
+                        $div = $('<div></div>')
+                            .dialog({
+                                title: this.name,
+                                width: 320,
+                                height: 300
+                            });
+
+                    window.chart = new Highcharts.Chart({
+                        chart: {
+                            renderTo: $div[0],
+                            type: 'pie',
+                            width: 290,
+                            height: 240
+                        },
+                        title: {
+                            text: TITLE
+                        },
+                        credits:{
+                            enabled: false
+                        },
+                        series: [{
+                            name: 'Trade',
+                            data: [{
+                                name: 'Imports',
+                                color: ICOLOR,
+                                y: parseInt(this.imports, 10)
+                            }, {
+                                name: 'Exports',
+                                color: ECOLOR,
+                                y: parseInt(this.exports, 10)
+                            }],
+                            dataLabels: {
+                                format: '<b>{point.name}</b> {point.percentage:.1f}%'
+                            }
+                        }]
+                    });
+                }
+                // Initiate the chart
+                Highcharts.mapChart('chart3', {
+                    chart: {
+                        map: 'custom/world',
+                        borderWidth: 1,
+                        backgroundColor: 'white',
+                        plotBackgroundColor: 'white'
+                    },
+
+                    title: {
+                        text: '<b>World Map of Pakistan Trade for ' + TITLE + '</b>'
+                    },
+                    credits: {
+                        enabled:false
+                    },
+                    tooltip: {
+                        backgroundColor: 'white',
+                        borderWidth: 0,
+                        shadow: false,
+                        useHTML: true,
+                        padding: 0,
+                        pointFormat: '<span class="f32" style="background-color:white;"><span class="flag {point.properties.hc-key}">' +
+                            '</span></span> {point.name}<br>' +
+                            '<span style="font-size:14px"><b>Total:</b> {point.value} M USD</span> <br>'+
+                            '<span style="font-size:14px"><b>Imports:</b> {point.imports} M USD</span> <br>'+
+                            '<span style="font-size:14px"><b>Exports:</b> {point.exports} M USD</span>',
+                        positioner: function () {
+                            return { x: 5, y: 220 };
+                        }
+                    },
+
+                    mapNavigation: {
+                        enabled: true,
+                        buttonOptions: {
+                            verticalAlign: 'top'
+                        }
+                    },
+
+                    legend: {
+                        title: {
+                            text: 'Millions Dollars',
+                            style: {
+                                color: ( // theme
+                                    Highcharts.defaultOptions &&
+                                    Highcharts.defaultOptions.legend &&
+                                    Highcharts.defaultOptions.legend.title &&
+                                    Highcharts.defaultOptions.legend.title.style &&
+                                    Highcharts.defaultOptions.legend.title.style.color
+                                ) || 'black'
+                            }
+                        },
+                        align: 'left',
+                        verticalAlign: 'bottom',
+                        floating: true,
+                        layout: 'vertical',
+                        valueDecimals: 0,
+                        backgroundColor: ( // theme
+                            Highcharts.defaultOptions &&
+                            Highcharts.defaultOptions.legend &&
+                            Highcharts.defaultOptions.legend.backgroundColor
+                        ) || 'rgba(255, 255, 255, 0.85)',
+                        symbolRadius: 0,
+                        symbolHeight: 14
+                    },
+
+                    colorAxis: {
+                        dataClasses: [{
+                            color: '#FED976',
+                            to: .999
+                        }, {
+                            color: '#FEB24C',
+                            from: 1,
+                            to: 10
+                        }, {
+                            color: '#FD8D3C',
+                            from: 10,
+                            to: 25
+                        }, {
+                            color: '#FC4E2A',
+                            from: 25,
+                            to: 50
+                        }, {
+                            color:'#E31A1C',
+                            from: 50,
+                            to: 100
+                        }, {
+                            color: '#BD0026',
+                            from: 100,
+                            to: 500
+                        }, {
+                            color:'#800026',
+                            from: 501
+                        }]
+                    },
+
+                    series: [{
+                        data: data,
+                        nullColor: 'grey',
+                        //keys: ['code', 'value'],
+                        joinBy: ['iso-a3', 'code'],
+                        animation: true,
+                        name: 'Trade Data',
+                        states: {
+                            hover: {
+                                color: 'black'
+                            }
+                        },
+                        point: {
+                            events: {
+                                click: pointClick
+                            }
+                        },
+                        shadow: false
+                    }]
+                });
+
+            }
+
+
+
+            function Chart_03_Map2() {
+
+                var data = [];
+
+                for (var i = 0; i < CD3.length; i++) {
+                    if (CD3[i].ID == "pak") {
+                        continue;
+                    }
+                    data.push({
+                        code: CD3[i].ID.toUpperCase(), value: +(((CD3[i].ExportsInDollars / 1000000) - (CD3[i].ImportsInDollars / 1000000)).toFixed(4)), name: CD3[i].Name, imports: +((CD3[i].ImportsInDollars / 1000000).toFixed(4)), exports: +((CD3[i].ExportsInDollars / 1000000).toFixed(4))
+                    });
+                }
+                // Initiate the chart
+                Highcharts.mapChart('chart3', {
+                    chart: {
+                        map: 'custom/world',
+                        borderWidth: 1,
+                        backgroundColor: 'white',
+                        plotBackgroundColor: 'white'
+                    },
+
+                    title: {
+                        text: '<b>World Map of Pakistan Trade for ' + TITLE + '</b>'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'white',
+                        borderWidth: 0,
+                        shadow: false,
+                        useHTML: true,
+                        padding: 0,
+                        pointFormat: '<span class="f32" style="background-color:white;"><span class="flag {point.properties.hc-key}">' +
+                            '</span></span> {point.name}<br>' +
+                            '<span style="font-size:14px"><b>Total:</b> {point.value} M USD</span> <br>' +
+                            '<span style="font-size:14px"><b>Imports:</b> {point.imports} M USD</span> <br>' +
+                            '<span style="font-size:14px"><b>Exports:</b> {point.exports} M USD</span>',
+                        positioner: function () {
+                            return { x: 5, y: 400 };
+                        }
+                    },
+
+                    mapNavigation: {
+                        enabled: true,
+                        buttonOptions: {
+                            verticalAlign: 'top'
+                        }
+                    },
+
+                    legend: {
+                        align: 'center',
+                        verticalAlign: 'bottom',
+                        floating: true,
+                        layout: 'horizontal',
+                        valueDecimals: 0,
+                        backgroundColor: ( // theme
+                            Highcharts.defaultOptions &&
+                            Highcharts.defaultOptions.legend &&
+                            Highcharts.defaultOptions.legend.backgroundColor
+                        ) || 'rgba(255, 255, 255, 0.85)'
+                    },
+                    colorAxis: {
+                        dataClasses: [{
+                            to: -.00010,
+                            color: ICOLOR,
+                            name: 'Trade Deficit'
+                        }, {
+                            from: -.00010,
+                            to: .00010,
+                            color: 'yellow',
+                            name: 'No Balance'
+                        }, {
+                            from: .00010,
+                            color: ECOLOR,
+                            name: 'Trade Surplus'
+                        }]
+                    },
+
+                    series: [{
+                        data: data,
+                        nullColor: 'grey',
+                        //keys: ['code', 'value'],
+                        joinBy: ['iso-a3', 'code'],
+                        animation: true,
+                        name: 'Trade Data',
+                        states: {
+                            hover: {
+                                color: 'black'
+                            }
+                        },
+                        shadow: false
+                    }]
+                });
+            }
+
+
+
+            function Chart_03_Map_ind() {
+
+                var data = [];
+
+                if ($(".exx").hasClass("active")) {
+                    for (var i = 0; i < CD3.length; i++) {
+                        if (CD3[i].ID == "pak") {
+                            continue;
+                        }
+                        data.push({
+                            code: CD3[i].ID.toUpperCase(), value: +((CD3[i].ExportsInDollars / 1000000).toFixed(3)), name: CD3[i].Name, imports: +((CD3[i].ImportsInDollars / 1000000).toFixed(3))
+                        });
+                    }
+                }
+                else if ($(".imx").hasClass("active")) {
+                    for (var i = 0; i < CD3.length; i++) {
+                        if (CD3[i].ID == "pak") {
+                            continue;
+                        }
+                        data.push({
+                            code: CD3[i].ID.toUpperCase(), value: +((CD3[i].ImportsInDollars / 1000000).toFixed(3)), name: CD3[i].Name, exports: +((CD3[i].ExportsInDollars / 1000000).toFixed(3))
+                        });
+                    }
+                }
+
+                // Initiate the chart
+                Highcharts.mapChart('chart3', {
+                    chart: {
+                        map: 'custom/world',
+                        borderWidth: 1,
+                        backgroundColor: 'white',
+                        plotBackgroundColor: 'white'
+                    },
+
+                    title: {
+                        text: '<b>World Map of Pakistan '+IND+' for ' + TITLE + '</b>'
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'white',
+                        borderWidth: 0,
+                        shadow: false,
+                        useHTML: true,
+                        padding: 0,
+                        pointFormat: '<span class="f32" style="background-color:white;"><span class="flag {point.properties.hc-key}">' +
+                            '</span></span> {point.name}<br>' +
+                            '<span style="font-size:14px"><b>'+IND+':</b> {point.value} M USD</span> <br>',
+                        positioner: function () {
+                            return { x: 5, y: 260 };
+                        }
+                    },
+
+                    mapNavigation: {
+                        enabled: true,
+                        buttonOptions: {
+                            verticalAlign: 'top'
+                        }
+                    },
+
+                    legend: {
+                        title: {
+                            text: 'Millions Dollars',
+                            style: {
+                                color: ( // theme
+                                    Highcharts.defaultOptions &&
+                                    Highcharts.defaultOptions.legend &&
+                                    Highcharts.defaultOptions.legend.title &&
+                                    Highcharts.defaultOptions.legend.title.style &&
+                                    Highcharts.defaultOptions.legend.title.style.color
+                                ) || 'black'
+                            }
+                        },
+                        align: 'left',
+                        verticalAlign: 'bottom',
+                        floating: true,
+                        layout: 'vertical',
+                        valueDecimals: 0,
+                        backgroundColor: ( // theme
+                            Highcharts.defaultOptions &&
+                            Highcharts.defaultOptions.legend &&
+                            Highcharts.defaultOptions.legend.backgroundColor
+                        ) || 'rgba(255, 255, 255, 0.85)',
+                        symbolRadius: 0,
+                        symbolHeight: 14
+                    },
+
+                    colorAxis: {
+                        dataClasses: [{
+                            color: '#FED976',
+                            to: .999
+                        }, {
+                            color: '#FEB24C',
+                            from: 1,
+                            to: 10
+                        }, {
+                            color: '#FD8D3C',
+                            from: 10,
+                            to: 25
+                        }, {
+                            color: '#FC4E2A',
+                            from: 25,
+                            to: 50
+                        }, {
+                            color: '#E31A1C',
+                            from: 50,
+                            to: 100
+                        }, {
+                            color: '#BD0026',
+                            from: 100,
+                            to: 500
+                        }, {
+                            color: '#800026',
+                            from: 501
+                        }]
+                    },
+
+                    series: [{
+                        data: data,
+                        nullColor: 'grey',
+                        //keys: ['code', 'value'],
+                        joinBy: ['iso-a3', 'code'],
+                        animation: true,
+                        name: 'Trade Data',
+                        states: {
+                            hover: {
+                                color: 'black'
+                            }
+                        },
+                        shadow: false
+                    }]
+                });
+
+            }
+
+
+
+        });
+    </script>
+}

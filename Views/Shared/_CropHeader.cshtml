@@ -1,0 +1,29 @@
+﻿@{
+    var isDashboard = ViewBag.CropPage != null;
+    var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin";
+    var names = new System.Collections.Generic.Dictionary<string, string> { { "overview", "Overview" }, { "crop", "Crop profile" }, { "area", "Area profile" }, { "compare", "Rankings & race" } };
+    var heading = isDashboard ? names[(string)ViewBag.CropPage] : (string)ViewBag.Title;
+}
+<header class="topbar atlas-header">
+    <div class="header-location">
+        <button id="menu-toggle" class="shell-icon-button" type="button" aria-label="Open navigation" aria-controls="crop-navigation" aria-expanded="false"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-menu")"></use></svg></button>
+        <span class="header-mark"><svg aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#wheat")"></use></svg></span>
+        <div class="header-heading"><span class="header-eyebrow">PAKISTAN <span aria-hidden="true">/</span> AGRICULTURE</span><b id="breadcrumb">@heading</b></div>
+    </div>
+    <div class="header-actions">
+        @if (isDashboard) {
+            <button id="share" class="quiet header-share" type="button" aria-label="Share view"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-share")"></use></svg><span>Share view</span></button>
+            <button id="download" class="button header-export" type="button"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-download")"></use></svg><span>Export CSV</span></button>
+        }
+        @if (isAdmin) {
+            <span class="admin-identity"><span class="admin-avatar" aria-hidden="true">A</span><span>Admin<small>Data workspace</small></span></span>
+            using (Html.BeginForm("Logout", "CropAdmin", FormMethod.Post)) {
+                @Html.AntiForgeryToken()<button type="submit" class="quiet admin-entry" aria-label="Sign out"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-logout")"></use></svg><span>Sign out</span></button>
+            }
+        } else if (isDashboard) {
+            <a class="quiet admin-entry" href="@Url.Action("Login", "CropAdmin")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-shield")"></use></svg><span>Admin sign in</span></a>
+        } else {
+            <a class="quiet admin-entry" href="@Url.Action("Home", "Crops")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg><span>Back to atlas</span></a>
+        }
+    </div>
+</header>

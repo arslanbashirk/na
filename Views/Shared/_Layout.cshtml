@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National Account Dashboard</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+
+    @RenderBody()
+    <hr />
+    <!-- 📌 Footer Section -->
+    <footer style="background: teal; color:white; padding: 20px 0; text-align: center; border-top: 1px solid #ddd;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 15px;">
+            <p style="margin: 0; font-size: 16px;">
+                &copy; 2025 Pakistan Bureau of Statistics. All rights reserved.
+            </p>
+            <p style="margin: 5px 0 0; font-size: 14px;">
+                <a href="https://www.pbs.gov.pk" target="_blank" style="text-decoration: none; color:white;">
+                    www.pbs.gov.pk
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,338 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+        <style>
+            .chart {
+                background-color: white;
+                border-radius: 10px;
+                height: 300px;
+                box-shadow: 2px 2px 5px 5px skyblue;
+            }
+
+            .rm {
+                padding-left: 7px;
+                padding-right: 7px;
+                margin-bottom: 15px;
+            }
+
+            .top-curve {
+                border-radius: 12px 12px 0px 0px;
+                color: black;
+                font-weight: bold;
+            }
+
+            .bottom-curve {
+                border-radius: 0px 0px 12px 12px;
+            }
+
+            .tdhead {
+                border-top: none;
+            }
+
+            #prvtbl tr > td:not(:nth-child(1)) {
+                text-align: center;
+            }
+
+            .info {
+                padding: 6px 8px;
+                font: 14px/16px Arial, Helvetica, sans-serif;
+                background: white;
+                background: rgba(255,255,255,0.8);
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                border-radius: 5px;
+            }
+
+            .info.hover {
+                position: absolute;
+                right: 0px;
+                left: auto;
+                width: 120px;
+            }
+
+            .info h3 {
+                margin: 0 0 5px;
+                color: #777;
+                }
+
+            .leaflet-right.leaflet-top {
+                right: 0px;
+                left: auto;
+            }
+
+            .legend {
+                text-align: left;
+                line-height: 18px;
+                color: #555;
+            }
+
+            .legend i {
+                width: 18px;
+                height: 18px;
+                float: left;
+                margin-right: 8px;
+                opacity: 0.7;
+            }
+
+            .map div {
+                background-color: whitesmoke;
+            }
+
+            .map h5 {
+                margin-bottom: 5px;
+                padding:5px;
+                background-color: whitesmoke;
+            }
+
+            .mycol {
+                padding-left: 5px;
+                padding-right: 5px;
+                margin-bottom: 10px;
+            }
+
+            .input-group-addon {
+                width: 80px;
+                background-color: darkgoldenrod;
+                color: white;
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                text-align: center;
+                padding-top: 7px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            .form-select {
+                border: solid 1px darkgoldenrod;
+            }
+            .navbar {
+                background-color: darkgoldenrod;
+            }
+        </style>
+    </head>
+}
+<main>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="position:relative; height:415px">
+                    <img src="~/Content/images/agri.jpg" style="width:100%; height:410px; position:absolute; right:0px; left:0px; " />
+                    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
+                        <div class="container-fluid">
+                            @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                                <ul class="navbar-nav flex-grow-1" style="font-weight:bold;">
+                                    <li>@Html.ActionLink("GDP", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                                    <li>@Html.ActionLink("Service", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                                    <li>@Html.ActionLink("Agriculture", "Index", "Crops", new { area = "" }, new { @class = "nav-link" })</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <img src="~/Content/images/logo.png" style="width:200px; height:auto; position:absolute; right:5px; bottom:80px;" />
+                    <div style="z-index: 1; position: absolute; right: 5px; left:5px; padding: 2px 10px; bottom: 20px; background-color: darkgoldenrod; opacity: 80%; border-radius: 5px;">
+                        <h2 style="color:white; font-weight:bold;">Welcome to Agriculture Statistics of Pakistan</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="position:relative">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="background-color:lightgoldenrodyellow; padding:5px; border-radius:5px; font-size:18px; margin-bottom:10px;">
+                        <h2>National Accounts (Agriculture Statistics)</h2>
+                        <p style="margin-bottom:0px; text-align:justify; font-weight:400">National Accounts of Pakistan collect, process, maintain, and disseminate large volumn of data about different Economic, Social Sectors of Pakistan. National Accounts Produce GDP Figures. GDP of Pakistan comprise of various sector, including which Agriculture has been one of the most important sector of Pakistan since creation of Pakistan. Agriculture Statistics include Production, Yield, Cultivation of 121 crops of Pakistan, and its segregation across different districts of Pakistan.</p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Province</span>
+                        <select id="province" class="form-select">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Division</span>
+                        <select id="division" class="form-select">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">District</span>
+                        <select id="district" class="form-select">
+                            <option value="0">Select District</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Year</span>
+                        <select id="year" class="form-select">
+                            <option value="0">Select Year</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Crops</span>
+                        <select id="crop" class="form-select">
+                            <option value="0">Select Crop</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-top:10px;">
+                <div class="col-sm-3 map">
+                    <h5>KPK Map</h5>
+                    <div id="prv1" style="height: 450px;"></div>
+                </div>
+                <div class="col-sm-3 map">
+                    <h5>PUNJAB MAP</h5>
+                    <div id="prv2" style="height:450px;"></div>
+                </div>
+                <div class="col-sm-3 map">
+                    <h5>SINDH MAP</h5>
+                    <div id="prv3" style="height:450px;"></div>
+                </div>
+                <div class="col-sm-3 map">
+                    <h5>BALOCHISTAN MAP</h5>
+                    <div id="prv4" style="height:450px;"></div>
+                </div>
+            </div>
+
+            <div id="stage"></div>
+        </div>
+        </div>
+            
+</main>
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<script src="~/Scripts/site/pkmap.js"></script>
+<script src="~/Scripts/site/mypolygons.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $.get("/Crops/GetProvince", function (result) {
+            var str = "<option value='0'>National Level</opotion>";
+            $.each(result.data, function (index, value) {
+                str += "<option value=" + value.id + ">" + value.name + "</option>";
+            });
+            $("#province").html(str);
+        });
+
+
+        $.get("/Crops/GetDivision", function (result) {
+            var str = "<option value='0'>All Divisions</opotion>";
+            $.each(result.data, function (index, value) {
+                str += "<option value=" + value.id + ">" + value.name + "</option>";
+            });
+            $("#division").html(str);
+        });
+
+        setDistrict();
+
+        $.get("/Crops/GetYear", function (result) {
+            var str = "";
+            $.each(result.data, function (index, value) {
+                if (index == 1) {
+                    str += "<option selected value=" + value.year + ">" + value.year + "</option>";
+                }
+                else {
+                    str += "<option value=" + value.year + ">" + value.year + "</option>";
+                }
+            });
+            $("#year").html(str);
+        });
+
+        $.get("/Crops/GetCrops", function (result) {
+            var str = "<option value='0'>Overall</option>";
+            $.each(result.data, function (index, value) {
+                str += "<option value=" + value.id + ">" + value.name + "</option>";
+            });
+            $("#crop").html(str);
+        });
+
+        $("#division, #province").on("change", function () {
+            setDistrict();
+        });
+
+        $("#crop, #year").on("change", function () {
+            setCropData();
+        });
+
+        function setDistrict() {
+            var pv = $("#province").val();
+            var dv = $("#division").val();
+            var url = "/Crops/GetDistrict";
+            if ((pv != 0 && pv != null) && (dv != 0 && dv != null)) {
+                url += "/?pv=" + pv + "&dv=" + dv;
+            }
+            else if (pv != 0 && pv != null) {
+                url += "/?pv=" + pv;
+            }
+            else if (dv != 0 && dv != null) {
+                url += "/?dv=" + dv;
+            }
+            else {
+                url = url;
+            }
+            $.get(url, function (result) {
+                var str = "<option value='0'>All District</opotion>";
+                $.each(result.data, function (index, value) {
+                    str += "<option value=" + value.id + ">" + value.name + "</option>";
+                });
+                $("#district").html(str);
+            });
+        }
+
+        function setCropData() {
+            var pv = $("#province").val();
+            var dv = $("#division").val();
+            var ds = $("#district").val();
+            var year = $("#year").val();
+            var crop = $("#crop").val();
+            var url = "/Crops/GetCropsData";
+            url += "/?pv=" + pv + "&dv=" + dv + "&ds=" + ds + "&year=" + year + "&crop=" + crop;
+            
+            $.get(url, function (result) {
+                var data = result.data;
+                if (data != null) {
+                    $.each(mypolygon.features, function (index, value) {
+                        var index = data.findIndex(x => x.id == value.properties.dsid);
+                        if (index >= 0) {
+                            value.properties.value = data[index].area;
+                            value.properties.area = data[index].area;
+                            value.properties.production = data[index].production;
+                            value.properties.yield = data[index].yield;
+                        }
+                        else {
+                            value.properties.value = randomInteger(0, 10);
+                        }
+                        
+                    });
+                    LoadMapData("PUNJAB", 2, 31, 73, 6);
+                    LoadMapData("SINDH", 3, 26, 70, 6);
+                    LoadMapData("KHYBER PAKHTUNKHWA", 1, 34, 72, 6);
+                    LoadMapData("BALOCHISTAN", 4, 29, 66, 5.5);
+                }
+                
+            });
+        }
+
+
+        function randomInteger(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+
+    });
+</script>

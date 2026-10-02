@@ -1,0 +1,1141 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    <head>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+        <style>
+            .chart {
+                background-color: white;
+                border-radius: 10px;
+                height: 300px;
+                box-shadow: 2px 2px 5px 5px skyblue;
+            }
+
+            .rm {
+                padding-left: 7px;
+                padding-right: 7px;
+                margin-bottom: 15px;
+            }
+
+            .top-curve {
+                border-radius: 12px 12px 0px 0px;
+                color: black;
+                font-weight: bold;
+            }
+
+            .bottom-curve {
+                border-radius: 0px 0px 12px 12px;
+            }
+
+            .tdhead {
+                border-top: none;
+            }
+
+            #prvtbl tr > td:not(:nth-child(1)) {
+                text-align: center;
+            }
+
+            .info {
+                padding: 6px 8px;
+                font: 14px/16px Arial, Helvetica, sans-serif;
+                background: white;
+                background: rgba(255,255,255,0.8);
+                box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                border-radius: 5px;
+            }
+
+                .info.hover {
+                    float: left !important;
+                    clear: none !important;
+                }
+
+                .info h3 {
+                    margin: 0 0 5px;
+                    color: #777;
+                }
+
+            .leaflet-right.leaflet-top {
+                right: 0px;
+                left: auto;
+            }
+
+            .legend {
+                text-align: left;
+                line-height: 18px;
+                color: #555;
+            }
+
+                .legend i {
+                    width: 18px;
+                    height: 18px;
+                    float: left;
+                    margin-right: 8px;
+                    opacity: 0.7;
+                }
+
+            .map.div {
+                background-color: whitesmoke;
+            }
+
+            .map h5 {
+                margin-bottom: 5px;
+                padding: 5px;
+                background-color: whitesmoke;
+            }
+
+            .mycol {
+                padding-left: 5px;
+                padding-right: 5px;
+                margin-bottom: 10px;
+            }
+
+            .input-group-addon {
+                width: 80px;
+                background-color: green;
+                color: white;
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                text-align: center;
+                padding-top: 7px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+
+            .form-select {
+                border-color: green;
+            }
+
+            .navbar {
+                background-color: green;
+            }
+
+            .card-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .card {
+                background-image: linear-gradient(to top, darkgoldenrod, darkgoldenrod);
+                width: calc(25% - 20px);
+                width: calc(25% - 20px);
+                margin-top: 5px;
+                padding: 10px;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                color: white;
+            }
+
+            .card-1 {
+                background: linear-gradient(to bottom, #ff9a9e, #fecfef);
+            }
+
+            .card-2 {
+                background: linear-gradient(to bottom, #9eff9e, #c6efce);
+            }
+
+            .card-3 {
+                background: linear-gradient(to bottom, #9e9eff, #cec6f7);
+            }
+
+            .card-heading {
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+
+            .highcharts-a11y-proxy-container-after {
+                display: none;
+            }
+
+            .cards {
+                padding: 5px;
+                border-radius: 5px;
+                position: relative;
+            }
+
+            .card1 {
+                color: white;
+                background-color: green;
+            }
+
+            .card2 {
+                color: white;
+                background-color: green;
+            }
+
+            .card3 {
+                color: white;
+                background-color: green;
+            }
+
+            .card4 {
+                color: white;
+                background-color: green;
+            }
+
+            .card-text {
+                text-align: left;
+                font-size: 18px;
+                padding: 5px;
+            }
+
+            .card-header {
+                font-weight: bold;
+                font-size: 18px;
+                padding: 5px;
+            }
+
+            .cd-icon {
+                width: 100px;
+                height: auto;
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                bottom: 10px;
+            }
+        </style>
+    </head>
+}
+<main>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <div style="position:relative; height:415px">
+                    <img src="~/Content/images/agri.jpg" style="width:100%; height:410px; position:absolute; right:0px; left:0px; " />
+                    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark">
+                        <div class="container-fluid">
+                            @Html.ActionLink("Home", "Index", "GDP", new { area = "" }, new { @class = "navbar-brand" })
+                            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Toggle navigation" aria-controls="navbarSupportedContent"
+                                    aria-expanded="false" aria-label="Toggle navigation">
+                                <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                                <ul class="navbar-nav flex-grow-1" style="font-weight:bold;">
+                                    <li>@Html.ActionLink("Agriculture", "Home", "Crops", new { area = "" }, new { @class = "nav-link" })</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                    <img src="~/Content/images/logo.png" style="width:200px; height:auto; position:absolute; right:5px; bottom:80px;" />
+                    <div style="z-index: 1; position: absolute; right: 5px; left: 5px; padding: 2px 10px; bottom: 20px; background: linear-gradient(to right, #8ca315, #dfe17f); opacity: 80%; border-radius: 5px; ">
+                        <h2 style="color:white; font-weight:bold;">Welcome to Agriculture Statistics of Pakistan</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="position:relative">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div style="color:green; padding:5px; border-radius:5px; font-size:18px; margin-bottom:10px;">
+                        <h2>National Accounts (Agriculture Statistics)</h2>
+                        <p style="margin-bottom:0px; text-align:justify; font-weight:400">National Accounts of Pakistan collect, process, maintain, and disseminate large volumn of data about different Economic, Social Sectors of Pakistan. National Accounts Produce GDP Figures. GDP of Pakistan comprise of various sector, including which Agriculture has been one of the most important sector of Pakistan since creation of Pakistan. Agriculture Statistics include Production, Yield, Cultivation of 121 crops of Pakistan, and its segregation across different districts of Pakistan.</p>
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Province</span>
+                        <select id="pv" class="form-select">
+                            <option value="0">National Level</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Division</span>
+                        <select id="dv" class="form-select">
+                            <option value="0">All Divisions</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">District</span>
+                        <select id="ds" class="form-select">
+                            <option value="0">All District</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Year</span>
+                        <select id="year" class="form-select">
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-xs-4">
+                    <div class="input-group" style="width:100%;">
+                        <span class="input-group-addon">Crops</span>
+                        <select id="crop" class="form-select">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row block_summary" style="margin-top:10px;">
+                <div class="col-sm-12">
+                    <h2 id="area-specify"></h2>
+                </div>
+                <div class="col-sm-6 col-md-3 mb-3">
+                    <div class="cards card1">
+                        <div class="card-header">Crop Name</div>
+                        <i class="cd-icon cropicon"></i>
+                        <div class="card-body fs-1 text-center fw-bold pt-0">
+                            <p id="cropname" class="card-text">_______</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3 mb-3 ">
+                    <div class="cards card2">
+                        <div class="card-header">Cultivation Area</div>
+                        <i class="cd-icon" style="background-image:url('../../Content/images/icons/others/yield.png'); background-size:cover;"></i>
+                        <div class="card-body fs-1 text-center fw-bold pt-0">
+                            <p id="carea" class="card-text">_____</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3 mb-3 ">
+                    <div class="cards card3">
+                        <div class="card-header">Production</div>
+                        <i class="cd-icon" style="background-image:url('../../Content/images/icons/others/production1.png'); background-size:cover;"></i>
+                        <div class="card-body fs-1 text-center fw-bold pt-0">
+                            <p id="cproduction" class="card-text">_____</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-md-3 mb-3 ">
+                    <div class="cards card4">
+                        <div class="card-header">Yield</div>
+                        <i class="cd-icon" style="background-image:url('../../Content/images/icons/others/area.png'); background-size:cover;"></i>
+                        <div class="card-body fs-1 text-center fw-bold pt-0">
+                            <p id="cyield" class="card-text">_____</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-container" style="display:none;">
+                <div class="card">
+                    <h2 class="card-heading">Year <span class="year_name"></span>: <span class="crop_name"></span> </h2>
+                    <div class="card-row">
+                        <p>Cultivation Area: <span id="ca_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p>Production: <span id="cp_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p>Yield / Acre: <span id="cy_val"></span></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-heading">Year <span class="year_name"></span>: <span class="crop_name"></span></h2>
+                    <div class="card-row">
+                        <p>Area: <span id="pa_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p>Production: <span id="pp_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p>Yield / Acre: <span id="py_val"></span></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-heading">Best Districts: <span class="crop_name"></span></h2>
+                    <div class="card-row">
+                        <p><span id="da">Area: </span><span id="da_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p><span id="dp">Production: </span><span id="dp_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p><span id="dy">Yield: </span><span id="dy_val"></span></p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h2 class="card-heading">Best Year: <span class="crop_name"></span></h2>
+                    <div class="card-row">
+                        <p><span id="ya">Area: </span><span id="ya_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p><span id="yp">Production: </span><span id="yp_val"></span></p>
+                    </div>
+                    <div class="card-row">
+                        <p><span id="yy">Yield: </span><span id="yy_val"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+                <div class="col-sm-6 map">
+                    <div id="area-history" style="height: 400px;"></div>
+                </div>
+                <div class="col-sm-6 map">
+                    <div id="yield-history" style="height:400px;"></div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+                <div class="col-sm-12 map">
+                    <div class="row">
+                        <div class="col">
+                            <div class="btn-group d-flex" role="group" aria-label="Basic radio toggle button group">
+                                <label class="btn btn-outline-success flex-fill hbtn p active">Provinces</label>
+                                <label class="btn btn-outline-success flex-fill hbtn v">Divisions</label>
+                                <label class="btn btn-outline-success flex-fill hbtn d">Districts</label>
+                                <select id="att" class="btn btn-outline-dark flex-fill" for="hh">
+                                    <option value="Production">Production</option>
+                                    <option value="Area">Cultivation Area</option>
+                                    <option value="Yield">Yield</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="map" style="height:550px;"></div>
+                </div>
+                
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+                <div class="col-sm-12">
+                    <h2 id="my-table-head">Yearly Crop Data</h2>
+                    <table class="table table-bordered table-striped">
+                        <thead class="bg-success" style="color:white">
+                            <tr>
+                                <th>Fiscal Year</th>
+                                <th>Area</th>
+                                <th>Production</th>
+                                <th>Yield</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="stage"></div>
+        </div>
+    </div>
+
+</main>
+
+<script src="~/Scripts/jquery-3.4.1.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/mapdata/custom/world.js"></script>
+<script src="https://code.highcharts.com/highcharts-3d.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/sunburst.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+<script src="~/Scripts/charts/our-charts.js"></script>
+<script src="~/Scripts/polygons/mymap.js"></script>
+
+
+
+<script>
+    $(document).ready(function () {
+        var CD3 = [];
+        var MAP_POL;
+        var ACTIVE_LEVEL = 'Provinces';
+        var MAP_DATA;
+        var BUB_DATA;
+        var pol_pv;
+        var pol_dv;
+        var pol_ds;
+        var LEVEL = 11;
+        var AREA = '0';
+        var WCOLOR = [
+            {
+                color: 'grey',
+                to: 0
+            },{
+                color: '#FED976',
+                from: 1,
+                to: 5
+            }, {
+                color: '#FEB24C',
+                from: 5,
+                to: 10
+            }, {
+                color: '#FD8D3C',
+                from: 10,
+                to: 25
+            }, {
+                color: '#FC4E2A',
+                from: 25,
+                to: 50
+            },{
+                color: '#BD0026',
+                from: 100,
+                to: 500
+            }, {
+                color: '#800026',
+                from: 501
+            }];
+        fetchList("pv", "National Level", null);
+        fetchList("year", null, null);
+
+        $.get("/Crops/GetCrops", function (result) {
+            var str = "";
+            $.each(result.data, function (index, value) {
+                str += "<option value=" + value.id + ">" + value.name + "</option>";
+            });
+            $("#crop").html(str);
+            $("#crop option[value='4']").attr("selected", true);
+            setLevel();
+            setCards();
+            setHistory();
+            setMap2();
+            requestHierarchyData();
+        });
+
+
+
+
+
+        function setLevel() {
+            var pv = $("#pv").val();
+            var dv = $("#dv").val();
+            var ds = $("#ds").val();
+            if (pv == 0 || pv == '0') {
+                LEVEL = 11;
+                AREA = '0';
+            }
+            else if (dv == 0 || dv == '0') {
+                LEVEL = 12;
+                AREA = pv;
+            }
+            else if (ds == 0 || ds == '0') {
+                LEVEL = 13;
+                AREA = dv;
+            }
+            else {
+                LEVEL = 14;
+                AREA = ds;
+            }
+        }
+        $("#pv").on("change", function () {
+            fetchList("dv", "All Division", "pv");
+            setLevel();
+            setCards();
+            setHistory();
+            requestSetMap();
+        });
+
+        $("#dv").on("change", function () {
+            fetchList("ds", "All District", "dv");
+            setLevel();
+        });
+
+        function fetchList(item, display, parent) {
+            var parent_str = "&parent=0";
+            if (parent != null) {
+                parent_str = "&parent=" + $("#" + parent).val();
+            }
+            $.get("GetSelectList/?item=" + item + parent_str, function (result) {
+                var str = "";
+                if (display != null) {
+                    var str = "<option value='0'>" + display + "</option> ";
+                }
+
+                $.each(result.data, function (index, value) {
+                    str += "<option value=" + value.id + ">" + value.name + "</option>";
+                });
+                $("#" + item).html(str);
+                if (item == 'year') {
+                    $("#" + item + " option[value='2021-22']").attr("selected", true);
+                }
+
+                requestHierarchyData();
+            });
+
+            
+
+        }
+
+        //setDistrict();
+
+        $("#crop").on("change", function () {
+            $(".crop_name").html($("#crop option:selected").text());
+            $(".year_name").html($("#year option:selected").text());
+            var c = $("#crop").val();
+            var y = $("#year").val();
+            if (c != '0' && y != '0') {
+                //setCropData();
+                setCards();
+                setHistory();
+                requestSetMap();
+                requestHierarchyData();
+            }
+
+        });
+
+        $("#year").on("change", function () {
+            $(".crop_name").html($("#crop option:selected").text());
+            $(".year_name").html($("#year option:selected").text());
+
+            var c = $("#crop").val();
+            var y = $("#year").val();
+            if (c != '0' && c != '0') {
+                //setCropData();
+                setCards();
+                requestSetMap();
+                requestHierarchyData();
+            }
+
+        });
+        $(".hbtn").on("click", function () {
+            var h = $(this).html();
+            if (h != ACTIVE_LEVEL) {
+                $(".hbtn").removeClass("active");
+                $(this).addClass("active");
+                ACTIVE_LEVEL = h;
+                setMap2();
+            }
+        });
+
+        $(".wbtn").on("click", function () {
+            var h = $(this).html();
+            if (h == "Trade") {
+                $(".wbtn").removeClass("active");
+                $(this).addClass("active");
+
+                var option = "<option value='Import'>Import</option><option value='Export'>Export</option>";
+                $("#watt").html(option);
+            }
+            else {
+                $(".wbtn").removeClass("active");
+                $(this).addClass("active");
+
+                var option = "<option value='Production'>Production</option><option value='Area'>Area</option><option value='Yield'>Yield</option>";
+                $("#watt").html(option);
+            }
+        });
+
+
+        $("#att").on("change", function () {
+            readMap();
+        });
+
+
+        function setCards() {
+            $(".cropicon").css({
+                "background-image": "url('../Content/images/icons/item/id/" + $("#crop").val() + ".png')",
+                "background-size": "cover",
+                "background-position": "center"
+            });
+            $("#cropname").html($("#crop option:selected").text());
+            $.post('GetSimpleCard', {
+                level: LEVEL,
+                area: AREA,
+                year: $("#year").val(),
+                crop: $("#crop").val()
+            }, function (response) {
+                if (response.data != null) {
+                    var data = response.data;
+                    if (data.length == 1) {
+                        $("#carea").html(data[0].area);
+                        $("#cproduction").html(data[0].production);
+                        $("#cyield").html(data[0].yield);
+
+                        /*
+                        $("#ca_val").html(data[0].area);
+                        $("#cp_val").html(data[0].production);
+                        $("#cy_val").html(data[0].yield);
+                
+                        $("#pa_val").html(data[1].area);
+                        $("#pp_val").html(data[1].production);
+                        $("#py_val").html(data[1].yield);
+                
+                
+                        $("#da").html(removeString(data[3].title) + " (A): ");
+                        $("#dp").html(removeString(data[2].title) + " (P): ");
+                        $("#dy").html(removeString(data[4].title) + " (Y): ");
+                
+                        $("#da_val").html(data[3].area);
+                        $("#dp_val").html(data[2].production);
+                        $("#dy_val").html(data[4].yield);
+                
+                        $("#ya").html(data[6].title + " (A): ");
+                        $("#yp").html(data[5].title + " (P): ");
+                        $("#yy").html(data[7].title + " (Y): ");
+                
+                        $("#ya_val").html(data[6].area);
+                        $("#yp_val").html(data[5].production);
+                        $("#yy_val").html(data[7].yield);
+                        */
+
+                    }
+                    else {
+                        emptyTheCards();
+                    }
+                }
+                else {
+                    emptyTheCards();
+                }
+            });
+        }
+
+        function setHistory() {
+            $.post('GetYearly', {
+                level: LEVEL,
+                area: AREA,
+                crop: $("#crop").val()
+            }, function (response) {
+                if (response != null) {
+                    if (response.data != null) {
+                        var data = response.data;
+                        subtitle = "Crop Reporting Service";
+                        categories = $.map(data, (obj) => obj.fiscalyear);
+
+                        var ytitle = "Hectare";
+                        var title = "Cultivation Area  (" + $("#crop option:selected").text() + ")";
+                        var values = $.map(data, (obj) => obj.area);
+                        var threshold = Math.min(...values)/2;
+                        var input = [{ name: "Cultivation Area", data: values, threshold: threshold }];
+                        DisplaySapline("area-history", title, subtitle, ytitle, categories, input);
+
+                        /*
+                        ytitle = "(1000 MT)";
+                        data = response.data;
+                        title = "Production  (" + $("#crop option:selected").text() + ")";
+                        subtitle = "Crop Reporting Service";
+                        values = $.map(data, (obj) => obj.production);
+                        input = [{ name: "Production", data: values }];
+                        DisplayColumn("production-history", title, subtitle, ytitle, categories, input);
+                        */
+
+                        ytitle = "1000 MT / Hectare";
+                        title = "Yield (" + $("#crop option:selected").text() + ")";
+                        values = $.map(data, (obj) => obj.yield);
+                        input = [{ name: "Yield", data: values }];
+                        DisplayLine("yield-history", title, subtitle, ytitle, categories, input);
+
+                        var ytitle = ['Production (1000 MT)', 'Yield (Tonnes / Hectare)'];
+                        var yunit = ['KMT', 'T/H'];
+                        title = "Production & Yield (" + $("#crop option:selected").text() + ")";
+
+                        var bar = {
+                            name: 'Production',
+                            type: 'column',
+                            color: 'green',
+                            yAxis: 1,
+                            data: $.map(data, (obj) => obj.production),
+                            tooltip: {
+                                valueSuffix: ' K.MT'
+                            }
+                        };
+
+                        var line = {
+                            name: 'Yield',
+                            type: 'line',
+                            color: 'blue',
+                            data: $.map(data, (obj) => obj.yield),
+                            tooltip: {
+                                valueSuffix: ' T/H'
+                            }
+                        };
+                        var valuesArr = [bar, line];
+                        displayDualLineBar("yield-history", title, subtitle, ytitle, yunit, categories, valuesArr);
+                        var tstrt = "";
+                        $.each(data, function (index, value) {
+                            tstrt += "<tr>";
+                            tstrt += "<td>" + data[index].fiscalyear + "</td>";
+                            tstrt += "<td>" + data[index].area + "</td>";
+                            tstrt += "<td>" + data[index].production + "</td>";
+                            tstrt += "<td>" + data[index].yield + "</td>";
+                            tstrt += "</tr>";
+                        });
+                        $("#my-table-body").html(tstrt);
+                    }
+                    else {
+                    }
+                }
+                else {
+                }
+            });
+        }
+
+        function setMap2() {
+            $.getJSON("../../Scripts/polygons/" + ACTIVE_LEVEL + ".json", function (data) {
+                MAP_POL = data;
+                requestSetMap();
+            });
+
+        }
+
+        function requestHierarchyData() {
+            $.post('GetHierarchyWise', {
+                crop: $("#crop").val(),
+                year: $("#year").val(),
+            }, function (response) {
+                if (response != null) {
+                    if (response.data != null) {
+                        BUB_DATA = response.data;
+                    }
+                }
+            });
+
+        }
+
+       
+
+        
+
+        function requestSetMap() {
+            var l = 11;
+            if (ACTIVE_LEVEL == 'Divisions') {
+                l = 12;
+            }
+            else if (ACTIVE_LEVEL == 'Districts') {
+                l = 13;
+            }
+
+            $.post('GetMap', {
+                level: l,
+                crop: $("#crop").val(),
+                year: $("#year").val()
+            }, function (response) {
+                if (response != null) {
+                    if (response.data != null) {
+                        MAP_DATA = response.data;
+                        readMap();
+                    }
+                }
+            });
+        }
+
+        function readMap() {
+            MAP_DATA = addValuetoMap(MAP_DATA, $("#att").val());
+            //alert(JSON.stringify(MAP_DATA));
+            var gaps = decideLegend(MAP_DATA);
+            var geo = formatBoundariesAsGeoJSON(MAP_POL, MAP_DATA);
+            //initMap(pol_pv);
+            provinceMap(geo, gaps, ACTIVE_LEVEL);
+            setWorldMap();
+            //updateMap(pol_pv);
+        }
+
+        function addValuetoMap(data, att) {
+            if (att == 'Production') {
+                $.each(data, function (index, value) {
+                    data[index].value = data[index].production;
+                });
+            }
+            else if (att == 'Area') {
+                $.each(data, function (index, value) {
+                    data[index].value = data[index].area;
+                });
+            }
+            else if (att == 'Yield') {
+                $.each(data, function (index, value) {
+                    data[index].value = data[index].yield;
+                });
+            }
+            return data;
+        }
+
+        function decideLegend(data) {
+            var gaps = { gap: [0, 10, 50, 100, 200], unit: '', series:'', quantity:'' };
+            if (data != null) {
+                var min = Math.floor(Math.min(...data.map(d => d.value)));
+                var max = Math.ceil(Math.max(...data.map(d => d.value)));
+                const steps = 4;
+                var stepSize = Math.ceil((max - min) / steps);
+                //alert("min=" + min + ", max=" + max + ", step=" + stepSize);
+                stepSize = applyBase(stepSize);
+                gaps.unit = applyUnit(stepSize);
+                if (gaps.unit == 'K') {
+                    stepSize = stepSize / 1000;
+                }
+                else if (gaps.unit == 'M') {
+                    stepSize = stepSize / 1000000;
+                }
+                for (var i = 1; i <= 4; i++) {
+                    gaps.gap[i] = gaps.gap[i - 1] + stepSize;
+                }
+
+                gaps.series = $("#att").val();
+                if (gaps.series == "Production") {
+                    gaps.quantity = gaps.unit + ' MT';
+                }
+                else if (gaps.series == "Area") {
+                    gaps.quantity = gaps.unit + ' Hectare';
+                }
+                else if (gaps.series == "Yield") {
+                    gaps.quantity = gaps.unit + '';
+                }
+            }
+            return gaps;
+        }
+
+        function decideWorldLegend() {
+            var gaps = { gap: [0, 10, 50, 100, 200, 500], unit: '' };
+            if (CD3 != null) {
+                var min = Math.floor(Math.min(...CD3.map(d => d.value)));
+                var max = Math.ceil(Math.max(...CD3.map(d => d.value)));
+                const steps = 25;
+                var stepSize = Math.ceil((max - min) / steps);
+                //alert("min=" + min + ", max=" + max + ", step=" + stepSize);
+                stepSize = applyBase(stepSize);
+                gaps.unit = applyUnit(stepSize);
+                if (gaps.unit == 'K') {
+                    stepSize = stepSize / 1000;
+                }
+                else if (gaps.unit == 'M') {
+                    stepSize = stepSize / 1000000;
+                }
+                for (var i = 1; i <= 5; i++) {
+                    gaps.gap[i] = gaps.gap[i - 1] + (stepSize*i);
+                }
+
+
+                var from, to;
+
+                for (var i = 1; i <gaps.gap.length; i++) {
+                    from = gaps.gap[i-1];
+                    to = gaps.gap[i];
+
+                    WCOLOR[i].from = from;
+                    WCOLOR[i].to = to;
+                }
+                WCOLOR[6].from = to++;
+            }
+            return gaps;
+        }
+
+        function applyBase(num) {
+
+            if (num > 100000) {
+                return num - (num % 100000);
+            }
+            else if (num > 10000) {
+                return num - (num % 10000);
+            }
+            else if (num > 1000) {
+                return num - (num % 1000);
+            }
+            else if (num > 100) {
+                return num - (num % 100);
+            }
+            if (num > 10) {
+                return num - (num % 10);
+            }
+            else {
+                return num;
+            }
+        }
+
+        function applyUnit(num) {
+            if (num > 1000000) {
+                return 'M';
+            }
+            else if (num > 1000) {
+                return 'K';
+            }
+            else {
+                return '';
+            }
+        }
+
+
+        function emptyTheCards() {
+            $("#carea").html("NA");
+            $("#cproduction").html("NA");
+            $("#cyield").html("NA");
+
+            $("#ca_val").html("");
+            $("#cp_val").html("");
+            $("#cy_val").html("");
+
+            $("#pa_val").html("");
+            $("#pp_val").html("");
+            $("#py_val").html("");
+
+
+            $("#da").html("Area: ");
+            $("#dp").html("Production: ");
+            $("#dy").html("Yield: ");
+
+            $("#da_val").html("");
+            $("#dp_val").html("");
+            $("#dy_val").html("");
+
+            $("#ya").html("Area: ");
+            $("#yp").html("Production: ");
+            $("#yy").html("Yield: ");
+
+            $("#ya_val").html("");
+            $("#yp_val").html("");
+            $("#yy_val").html("");
+        }
+
+        function removeString(val) {
+            val = val.replace(" PROVINCE", "");
+            val = val.replace(" DIVISION", "");
+            val = val.replace(" DISTRICT", "");
+            return val;
+        }
+        function setDistrict() {
+            var pv = $("#province").val();
+            var dv = $("#division").val();
+            var url = "/Crops/GetDistrict";
+            if ((pv != 0 && pv != null) && (dv != 0 && dv != null)) {
+                url += "/?pv=" + pv + "&dv=" + dv;
+            }
+            else if (pv != 0 && pv != null) {
+                url += "/?pv=" + pv;
+            }
+            else if (dv != 0 && dv != null) {
+                url += "/?dv=" + dv;
+            }
+            else {
+                url = url;
+            }
+            $.get(url, function (result) {
+                var str = "<option value='0'>All District</opotion>";
+                $.each(result.data, function (index, value) {
+                    str += "<option value=" + value.id + ">" + value.name + "</option>";
+                });
+                $("#district").html(str);
+            });
+        }
+
+        function setCropData() {
+            var pv = $("#province").val();
+            var dv = $("#division").val();
+            var ds = $("#district").val();
+            var year = $("#year").val();
+            var crop = $("#crop").val();
+            var url = "/Crops/GetCropsData";
+            url += "/?pv=" + pv + "&dv=" + dv + "&ds=" + ds + "&year=" + year + "&crop=" + crop;
+
+            $.get(url, function (result) {
+                var data = result.data;
+                if (data != null) {
+                    $.each(mypolygon.features, function (index, value) {
+                        var index = data.findIndex(x => x.id == value.properties.dsid);
+                        if (index >= 0) {
+                            value.properties.value = data[index].area;
+                            value.properties.area = data[index].area;
+                            value.properties.production = data[index].production;
+                            value.properties.yield = data[index].yield;
+                        }
+                        else {
+                            value.properties.value = randomInteger(0, 10);
+                        }
+
+                    });
+                    //LoadMapData("PUNJAB", 2, 31, 73, 6);
+                    //LoadMapData("SINDH", 3, 26, 70, 6);
+                    //LoadMapData("KHYBER PAKHTUNKHWA", 1, 34, 72, 6);
+                    //LoadMapData("BALOCHISTAN", 4, 29, 66, 5.5);
+                }
+
+            });
+        }
+
+
+
+
+
+        function Chart_03_Map_ind(legend) {
+
+            var data = CD3;
+            // Initiate the chart
+            Highcharts.mapChart('worldmap', {
+                chart: {
+                    map: 'custom/world',
+                    borderWidth: 1,
+                    backgroundColor: 'white',
+                    plotBackgroundColor: 'white'
+                },
+
+                title: {
+                    text: '<b>World Map Wheat Production Year - 2022</b>'
+                },
+                credits: {
+                    enabled: false
+                },
+                tooltip: {
+                    backgroundColor: 'white',
+                    borderWidth: 0,
+                    shadow: false,
+                    useHTML: true,
+                    padding: 0,
+                    pointFormat: '<span class="f32" style="background-color:white;"><span class="flag {point.properties.hc-key}">' +
+                        '</span></span> {point.name}<br>' +
+                        '<span style="font-size:14px"> {point.value}' + legend.unit + '</span> <br>',
+                    positioner: function () {
+                        return { x: 5, y: 200 };
+                    }
+                },
+
+                mapNavigation: {
+                    enabled: true,
+                    buttonOptions: {
+                        verticalAlign: 'top'
+                    }
+                },
+
+                legend: {
+                    title: {
+                        text: 'Production',
+                        style: {
+                            color: ( // theme
+                                Highcharts.defaultOptions &&
+                                Highcharts.defaultOptions.legend &&
+                                Highcharts.defaultOptions.legend.title &&
+                                Highcharts.defaultOptions.legend.title.style &&
+                                Highcharts.defaultOptions.legend.title.style.color
+                            ) || 'black'
+                        }
+                    },
+                    align: 'left',
+                    verticalAlign: 'bottom',
+                    floating: true,
+                    layout: 'vertical',
+                    valueDecimals: 0,
+                    backgroundColor: ( // theme
+                        Highcharts.defaultOptions &&
+                        Highcharts.defaultOptions.legend &&
+                        Highcharts.defaultOptions.legend.backgroundColor
+                    ) || 'rgba(255, 255, 255, 0.85)',
+                    symbolRadius: 0,
+                    symbolHeight: 14
+                },
+
+                colorAxis: {
+                    dataClasses: WCOLOR
+                },
+
+                series: [{
+                    data: data,
+                    nullColor: 'grey',
+                    //keys: ['code', 'value'],
+                    joinBy: ['iso-a3', 'code'],
+                    tileLayer: {
+                        urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        attribution: '&copy; OpenStreetMap contributors',
+                        opacity: 0.7
+                    },
+                    animation: true,
+                    name: 'Production',
+                    states: {
+                        hover: {
+                            color: 'black'
+                        }
+                    },
+                    shadow: false
+                }]
+            });
+
+        }
+
+    });
+</script>

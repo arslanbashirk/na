@@ -1,0 +1,39 @@
+﻿@{
+    var cropPage = (string)ViewBag.CropPage;
+    var adminPage = (string)ViewBag.AdminPage;
+    var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin";
+    var items = new[] {
+        new { Page = "overview", Action = "Home", Icon = "grid", Title = "Overview", Detail = "The national harvest" },
+        new { Page = "crop", Action = "CropProfile", Icon = "sprout", Title = "Crop profile", Detail = "One crop, every perspective" },
+        new { Page = "area", Action = "AreaProfile", Icon = "pin", Title = "Area profile", Detail = "Explore the places that grow" },
+        new { Page = "compare", Action = "Compare", Icon = "bars", Title = "Rankings & race", Detail = "Follow a changing leaderboard" }
+    };
+}
+<a class="skip-link" href="#main-content">Skip to content</a>
+<button class="nav-backdrop" type="button" aria-label="Close navigation" hidden></button>
+<aside class="sidebar atlas-sidebar" id="crop-navigation" aria-label="Crop Atlas navigation">
+    <div class="sidebar-brand-row">
+        <a class="brand" href="@Url.Action("Home", "Crops")"><span class="brand-emblem"><svg class="brand-crop" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#wheat")"></use></svg></span><span><small>PAKISTAN</small><strong>Crop Atlas</strong><em>Fields. Figures. Futures.</em></span></a>
+        <button id="menu-close" class="shell-icon-button" type="button" aria-label="Close navigation"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-close")"></use></svg></button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <p class="nav-label">EXPLORE THE ATLAS</p>
+    <nav class="atlas-menu" aria-label="Crop dashboard pages">
+        @foreach (var item in items) {
+            var active = cropPage == item.Page;
+            <a href="@Url.Action(item.Action, "Crops")" data-nav="@item.Page" class="@(active ? "active" : "")" aria-current="@(active ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-" + item.Icon)"></use></svg></span><span class="menu-copy"><strong>@item.Title</strong><small>@item.Detail</small></span><svg class="shell-icon menu-arrow" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg></a>
+        }
+    </nav>
+    @if (isAdmin) {
+        <p class="nav-label admin-nav-label">MANAGE CROP DATA</p>
+        <nav class="atlas-menu admin-links" aria-label="Admin facilities">
+            <a href="@Url.Action("Explorer", "CropAdmin")" class="@(adminPage == "explorer" ? "active" : "")" aria-current="@(adminPage == "explorer" ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-database")"></use></svg></span><span class="menu-copy"><strong>Data explorer</strong><small>Review source observations</small></span></a>
+            <a href="@Url.Action("Import", "CropAdmin")" class="@(adminPage == "import" ? "active" : "")" aria-current="@(adminPage == "import" ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-upload")"></use></svg></span><span class="menu-copy"><strong>Import crop data</strong><small>Bring the next harvest into view</small></span></a>
+        </nav>
+    }
+    <div class="sidebar-note atlas-sidebar-bottom">
+        <div class="sidebar-field-note"><svg aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#rice")"></use></svg><p>Discover the story<br /><strong>behind every harvest.</strong></p><small>Production · Land · Productivity</small></div>
+        <a class="return-dashboard" href="@Url.Action("Index", "GDP")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-grid")"></use></svg><span>Main dashboard</span><span aria-hidden="true">↗</span></a>
+        <div class="sidebar-source"><span class="live-dot"></span>Pakistan Bureau of Statistics</div>
+    </div>
+</aside>

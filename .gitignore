@@ -1,0 +1,24 @@
+# Visual Studio and build output
+.vs/
+[Bb]in/
+[Oo]bj/
+packages/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+Properties/PublishProfiles/
+*.pubxml
+*.pubxml.user
+# Private local configuration and credentials
+ConnectionStrings.local.config
+.env
+.env.*
+*.pfx
+*.p12
+*.key
+# Archives, logs and Python cache
+*.zip
+*.log
+__pycache__/
+*.pyc

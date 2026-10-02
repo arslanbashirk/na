@@ -1,0 +1,21 @@
+{
+  "tool": "Built-in imagegen",
+  "purpose": "Illustrative Pakistan agriculture imagery for Crop Atlas; not documentary photographs of specific locations.",
+  "assets": [
+    {
+      "page": "crop",
+      "path": "Content/images/pakistan-crop-profile-banner.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: premium panoramic website hero banner for Pakistan Crop Atlas. Landscape aspect ratio approximately 3:1. Sophisticated authentic agricultural editorial photography, tactile natural detail, rich emerald greens, warm harvest gold and earthy shadows, coherent with an elegant Pakistan agriculture dashboard. Composition: left 45 percent calm dark negative space for white text; concentrate the subject and highlights on the right. No text, no letters, no logos, no flags, no watermarks, no UI graphics. Illustrative scene, not documentation of an actual specific location. Scene: beautiful Pakistani harvest still life in an open rural farm courtyard. On the right, shallow woven baskets and cloth sacks holding golden wheat grain, white rice, dry chickpeas, ripe maize ears and fluffy raw cotton bolls; a few wheat stalks and sugarcane stems placed naturally alongside, weathered wooden table, warm late afternoon sun and blurred green agricultural background. The left is a quiet shaded portion of the courtyard and dark wooden tabletop, no large objects there. Luxurious restrained still-life photography, believable crops and materials, inviting warm highlights and deep green background, not a collage."
+    },
+    {
+      "page": "area",
+      "path": "Content/images/pakistan-area-profile-banner.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: premium panoramic website hero banner for Pakistan Crop Atlas. Landscape aspect ratio approximately 3:1. Sophisticated authentic agricultural editorial photography, tactile natural detail, rich emerald greens, warm harvest gold and earthy shadows, coherent with an elegant Pakistan agriculture dashboard. Composition: left 45 percent calm dark negative space for white text; concentrate the subject and highlights on the right. No text, no letters, no logos, no flags, no watermarks, no UI graphics. Illustrative scene, not documentation of an actual specific location. Scene: cinematic elevated aerial view of irrigated farmland in Pakistan's Indus plain. A beautiful mosaic of emerald cultivated plots, golden harvested fields, narrow tree-lined irrigation canals and small traditional rural buildings on the right, broad agricultural landscape fading toward a hazy horizon. Rich texture and gentle morning light, subtle atmospheric depth. Left side is quieter shaded green field patterns with no distracting buildings. Realistic rural Pakistan geography, no mountains required, no dramatic fantasy terrain, authentic irrigation patterns."
+    },
+    {
+      "page": "compare",
+      "path": "Content/images/pakistan-rankings-banner.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: premium panoramic website hero banner for Pakistan Crop Atlas. Landscape aspect ratio approximately 3:1. Sophisticated authentic agricultural editorial photography, tactile natural detail, rich emerald greens, warm harvest gold and earthy shadows, coherent with an elegant Pakistan agriculture dashboard. Composition: left 45 percent calm dark negative space for white text; concentrate the subject and highlights on the right. No text, no letters, no logos, no flags, no watermarks, no UI graphics. Illustrative scene, not documentation of an actual specific location. Scene: dynamic elevated view across long parallel rows of Pakistani agricultural fields. Alternating rich green young crops and golden mature wheat, crisp linear perspective leading toward the hazy horizon; a small plausible red agricultural tractor and two farmers in traditional shalwar kameez on the far right working along a harvested strip. Warm sunrise light raking the rows, a sense of seasonal agricultural change and motion, peaceful realistic countryside. Left foreground in gentle dark green shadow, right side luminous golden texture, premium vibrant documentary aesthetic."
+    }
+  ]
+}
