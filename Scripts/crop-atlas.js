@@ -140,7 +140,7 @@
         const bestYield = places.filter(r => r.Yield != null).sort((a, b) => b.Yield - a.Yield)[0];
         const top3 = places.filter(r => r.Production != null).sort((a, b) => b.Production - a.Production).slice(0, 3).reduce((a, r) => a + (r.Share || 0), 0);
         $id('insights').innerHTML = insight('Production leader', leader ? escape(leader.name) + ' accounts for <b>' + number(leader.Share) + '%</b> of selected-region production.' : 'No production observation is available for this selection.', 'production') + insight('Productivity leader', bestYield ? escape(bestYield.name) + ' reports <b>' + number(bestYield.Yield, 3) + '</b> production per unit of area.' : 'No complete production / area pair is available.', 'productivity') + insight(t.MissingRows ? 'Measurement coverage' : 'Production concentration', t.MissingRows ? '<b>' + number(t.MissingRows, 0) + '</b> source records have missing measurements. Yield is suppressed where input pairs are incomplete.' : 'The top three reporting areas contribute <b>' + number(top3) + '%</b> of production in this selection.', 'summary');
-        renderTrends(); renderRanking(); renderRegion();
+        renderTrends();
         if (page !== 'compare') { renderPortfolio(); renderScatter(); }
         renderMap();
         raceYears = Array.from(new Set(history.map(r => r.FiscalYear))).sort();
@@ -199,11 +199,6 @@
     function bar(id, rows, metric, level, animation) {
         const top = rows.filter(r => r[metric] != null).sort((a, b) => b[metric] - a[metric]).slice(0, 10);
         chart(id, { chart: { type: 'bar', animation: animation && !reducedMotion }, xAxis: { categories: top.map(r => r.name) }, yAxis: { title: { text: metric === 'Yield' ? 'Production / area' : 'Reported units' } }, legend: { enabled: false }, tooltip: { valueDecimals: metric === 'Yield' ? 3 : 1 }, plotOptions: { series: { animation: animation && !reducedMotion, borderRadius: 3, cursor: 'pointer', point: { events: { click: function () { drillArea(this.options.placeId, level); } } }, dataLabels: { enabled: true, formatter: function () { return number(this.y, metric === 'Yield' ? 3 : 1); }, style: { fontSize: '10px', textOutline: 'none' } } } }, series: [{ name: metric, data: top.map((r, i) => ({ y: r[metric], placeId: r.id, color: colorFor(r.id) })) }] }, top.length);
-    }
-    function renderRanking() { const level = $id('map-level').value; bar('ranking-chart', grouped(current, level), $id('rank-metric').value, level, false); }
-    function renderRegion() {
-        const rows = grouped(current, 'province').filter(r => r.Production > 0);
-        chart('region-chart', { chart: { type: 'pie', height: 150 }, legend: { enabled: true, align: 'right', verticalAlign: 'middle', layout: 'vertical', itemStyle: { fontSize: '10px' } }, tooltip: { pointFormat: '<b>{point.percentage:.1f}%</b> of selected production' }, plotOptions: { pie: { innerSize: '72%', borderWidth: 3, borderColor: '#fffdf8', size: 125, center: ['28%', '50%'], dataLabels: { enabled: false }, showInLegend: true, cursor: 'pointer', point: { events: { click: function () { drillArea(this.options.placeId, 'province'); } } } } }, series: [{ name: 'Production', data: rows.map(r => ({ name: r.name, y: r.Production, placeId: r.id, color: colorFor(r.id) })) }] }, rows.length);
     }
     function renderPortfolio() {
         const rows = aggregate(data.portfolio.filter(r => r.FiscalYear === data.year), 'CropId', 'CropName').filter(r => r.Area != null).sort((a, b) => b.Area - a.Area).slice(0, 10);
@@ -328,9 +323,8 @@
         else if (button.dataset.scope === 'division') focus({ district: '0' }, 'district');
     });
     document.querySelectorAll('[data-metric]').forEach(button => button.onclick = () => { document.querySelector('[data-metric].active').classList.remove('active'); button.classList.add('active'); if (data) renderMap(); });
-    $id('map-level').onchange = () => { if (data) { renderMap(); renderRanking(); } };
+    $id('map-level').onchange = () => { if (data) { renderMap(); } };
     $id('labels').onchange = () => { if (data) renderMap(); };
-    $id('rank-metric').onchange = () => { if (data) renderRanking(); };
     $id('race-metric').onchange = () => { if (data) renderRace(); };
     $id('race-year').oninput = () => { stopRace(); raceIndex = Number($id('race-year').value); renderRace(); };
     $id('play').onclick = playRace;

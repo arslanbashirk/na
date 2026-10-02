@@ -20,6 +20,7 @@ with sync_playwright() as p:
         page.locator('#insights').scroll_into_view_if_needed()
         page.wait_for_function("Array.from(document.querySelectorAll('.harvest-photo, .insight-story-photo')).every(img => img.complete && img.naturalWidth > 1000)")
         assert page.locator('.insight-story-photo').count() == 2
+        assert page.locator('.ranking-panel').count() == 0
         banner_sources.add(page.locator('.harvest-photo').get_attribute('src'))
         page.evaluate('scrollTo(0, 0)')
         page.wait_for_timeout(800)
@@ -43,7 +44,7 @@ with sync_playwright() as p:
         ready()
         assert page.evaluate('location.pathname') == '/Crops/Home'
         assert page.locator('#focus-back').is_visible()
-    for chart in ['ranking-chart', 'region-chart', 'scatter-chart', 'portfolio-chart']:
+    for chart in ['scatter-chart', 'portfolio-chart']:
         point_click(chart, "String(p.options.cropId) !== document.querySelector('#crop').value" if chart == 'portfolio-chart' else 'true')
         page.click('#focus-back')
         ready()
