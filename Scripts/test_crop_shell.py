@@ -14,7 +14,10 @@ with sync_playwright() as p:
         response = page.goto('http://localhost:5187/Crops/' + route)
         assert response.status == 200
         page.wait_for_function("document.querySelector('#status').textContent.startsWith('Data loaded')", timeout=60000)
-        assert page.locator('.atlas-menu [aria-current="page"]').get_attribute('data-nav') == active
+        if active == 'area':
+            assert page.locator('.area-submenu [aria-current="page"]').get_attribute('data-area-nav') == 'province'
+        else:
+            assert page.locator('.atlas-menu [aria-current="page"]').get_attribute('data-nav') == active
         assert page.locator('.admin-links').count() == 0
         assert page.locator('.atlas-footer').is_visible()
         assert page.locator('#menu-toggle').is_hidden()
@@ -35,11 +38,11 @@ with sync_playwright() as p:
         assert page.locator('#main-content').evaluate('(el) => el.inert')
         page.wait_for_function("getComputedStyle(document.querySelector('#crop-navigation')).visibility === 'visible'")
         page.locator('#crop-navigation a').last.focus()
-        assert page.evaluate('document.activeElement === document.querySelector("#crop-navigation .return-dashboard")'), page.evaluate('({tag: document.activeElement.tagName, cls: document.activeElement.className, visibility: getComputedStyle(document.querySelector("#crop-navigation")).visibility})')
+        assert page.evaluate('document.activeElement === document.querySelector("#crop-navigation .sidebar-utility a:last-child")'), page.evaluate('({tag: document.activeElement.tagName, cls: document.activeElement.className, visibility: getComputedStyle(document.querySelector("#crop-navigation")).visibility})')
         page.keyboard.press('Tab')
         assert page.evaluate('document.activeElement === document.querySelector("#crop-navigation a")'), page.evaluate('({tag: document.activeElement.tagName, cls: document.activeElement.className})')
         page.keyboard.press('Shift+Tab')
-        assert page.evaluate('document.activeElement === document.querySelector("#crop-navigation .return-dashboard")')
+        assert page.evaluate('document.activeElement === document.querySelector("#crop-navigation .sidebar-utility a:last-child")')
         page.keyboard.press('Escape')
         assert page.locator('#menu-toggle').get_attribute('aria-expanded') == 'false'
         assert not page.locator('#main-content').evaluate('(el) => el.inert')

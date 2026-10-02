@@ -23,7 +23,32 @@ namespace NADashboard.Controllers
             return Dashboard("overview");
         }
         public ActionResult CropProfile() { return Dashboard("crop"); }
-        public ActionResult AreaProfile() { return Dashboard("area"); }
+        public ActionResult AreaProfile()
+        {
+            var action = !String.IsNullOrEmpty(Request.QueryString["district"]) && Request.QueryString["district"] != "0" ? "DistrictProfile"
+                : !String.IsNullOrEmpty(Request.QueryString["division"]) && Request.QueryString["division"] != "0" ? "DivisionProfile" : "ProvinceProfile";
+            var values = new System.Web.Routing.RouteValueDictionary(Request.QueryString.AllKeys.Where(k => k != null && k != "crop").ToDictionary(k => k, k => (object)Request.QueryString[k]));
+            return RedirectToAction(action, values);
+        }
+        public ActionResult ProvinceProfile() { return AreaDashboard("province"); }
+        public ActionResult DivisionProfile() { return AreaDashboard("division"); }
+        public ActionResult DistrictProfile() { return AreaDashboard("district"); }
+        private ActionResult AreaDashboard(string level)
+        {
+            ViewBag.CropPage = "area";
+            ViewBag.AreaLevel = level;
+            return View("AreaDashboard");
+        }
+        public ActionResult AreaComparison()
+        {
+            ViewBag.CropPage = "areaCompare";
+            return View("AreaComparison");
+        }
+        public ActionResult About()
+        {
+            ViewBag.CropPage = "about";
+            return View();
+        }
         public ActionResult Compare() { return Dashboard("compare"); }
         private ActionResult Dashboard(string page)
         {
@@ -75,14 +100,14 @@ namespace NADashboard.Controllers
         }
 
         [HttpGet]
-        public JsonResult Explore(int crop = 4, string year = null, string province = "0", string division = "0", string district = "0")
+        public JsonResult Explore(int crop = 4, string year = null, string province = "0", string division = "0", string district = "0", bool metadataOnly = false)
         {
             try
             {
                 var all = Observations();
                 var years = all.Select(r => r.FiscalYear).Distinct().OrderByDescending(y => y).ToList();
                 if (String.IsNullOrWhiteSpace(year)) year = years.FirstOrDefault();
-                if (!years.Contains(year) || !all.Any(r => r.CropId == crop))
+                if (!years.Contains(year) || (crop != 0 && !all.Any(r => r.CropId == crop)))
                 {
                     Response.StatusCode = 400;
                     return Json(new { error = "Select an available crop and fiscal year." }, JsonRequestBehavior.AllowGet);
@@ -112,10 +137,11 @@ namespace NADashboard.Controllers
                     crops = all.GroupBy(r => r.CropId).Select(g => new { id = g.Key, name = g.First().CropName }).OrderBy(c => c.name),
                     years,
                     geography,
-                    history = all.Where(r => r.CropId == crop && scope(r)),
-                    portfolio = all.Where(r => (r.FiscalYear == year || r.FiscalYear == previous) && scope(r))
+                    reportingAreas = all.Where(r => r.FiscalYear == year).Select(r => new { province = r.ProvinceId, division = r.DivisionId, district = r.DistrictId }).Distinct(),
+                    history = metadataOnly ? Enumerable.Empty<CropObservation>() : all.Where(r => (crop == 0 || r.CropId == crop) && scope(r)),
+                    portfolio = metadataOnly ? Enumerable.Empty<CropObservation>() : all.Where(r => (r.FiscalYear == year || r.FiscalYear == previous) && scope(r))
                 }, JsonRequestBehavior.AllowGet);
-                result.MaxJsonLength = 12000000;
+                result.MaxJsonLength = crop == 0 ? 64000000 : 12000000;
                 return result;
             }
             catch (Exception ex)

@@ -42,7 +42,7 @@ with sync_playwright() as p:
         errors.append(str(error))
         print('BROWSER ERROR:', error, flush=True)
     page.on('pageerror', page_error)
-    for route in ['Home', 'CropProfile', 'AreaProfile', 'Compare']:
+    for route in ['Home', 'CropProfile', 'Compare']:
         response = page.goto(BASE + '/Crops/' + route, wait_until='domcontentloaded')
         assert response.status == 200, route
         page.wait_for_function("document.querySelector('#status').textContent.startsWith('Data loaded')", timeout=60000)
@@ -50,14 +50,15 @@ with sync_playwright() as p:
         assert page.locator('.stat').count() == 4
         assert page.locator('#data-table tbody tr').count() > 0
         assert '\u00e2' not in page.locator('.brand').inner_text()
-        assert page.locator('.brand-crop use').count() == 1
+        assert page.locator('.pbs-brand-logo').count() == 1
         print('PASS: rendered', route)
     page.click('#play')
     # Race begins at the earliest year when the selection is the final year.
     before = page.locator('#race-label').inner_text()
     page.wait_for_function('(year) => document.querySelector("#race-label").textContent !== year', arg=before, timeout=5000)
     page.click('#play')
-    page.goto(BASE + '/Crops/AreaProfile?crop=4&province=3&division=18&district=990')
+    # Single-crop map behavior remains on the overview; area pages have their own suite.
+    page.goto(BASE + '/Crops/Home?crop=4&province=3&division=18&district=990')
     page.wait_for_function("document.querySelector('#status').textContent.startsWith('Data loaded')", timeout=60000)
     assert 'KARACHI' in page.locator('#selection').inner_text()
     page.select_option('#map-level', 'district')
@@ -68,7 +69,7 @@ with sync_playwright() as p:
     page.uncheck('#labels')
     page.select_option('#table-mode', 'history')
     with page.expect_download() as download:
-        page.click('#download')
+        page.click('#table-download')
     assert download.value.suggested_filename.endswith('.csv')
     page.select_option('#province', '2')
     page.wait_for_function("document.querySelector('#status').textContent.startsWith('Data loaded') && document.querySelector('#selection').textContent.includes('PUNJAB')", timeout=30000)

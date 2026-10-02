@@ -946,6 +946,11 @@
     <Content Include="Views\Crops\Index.cshtml" />
     <Content Include="Views\Crops\Home.cshtml" />
     <Content Include="Views\Crops\Dashboard.cshtml" />
+    <Content Include="Views\Crops\AreaDashboard.cshtml" />
+    <Content Include="Scripts\crop-area.js" />
+    <Content Include="Views\Crops\AreaComparison.cshtml" />
+    <Content Include="Views\Crops\About.cshtml" />
+    <Content Include="Scripts\crop-area-comparison.js" />
     <Content Include="Views\CropAdmin\Login.cshtml" />
     <Content Include="Views\CropAdmin\Explorer.cshtml" />
     <Content Include="Views\CropAdmin\Import.cshtml" />

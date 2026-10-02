@@ -1,27 +1,50 @@
-﻿@{
+@{
     var cropPage = (string)ViewBag.CropPage;
+    var areaLevel = (string)ViewBag.AreaLevel;
+    var comparisonLevel = Request.QueryString["level"];
+    if (comparisonLevel != "division" && comparisonLevel != "district") { comparisonLevel = "province"; }
     var adminPage = (string)ViewBag.AdminPage;
     var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin";
     var items = new[] {
         new { Page = "overview", Action = "Home", Icon = "grid", Title = "Overview", Detail = "The national harvest" },
-        new { Page = "crop", Action = "CropProfile", Icon = "sprout", Title = "Crop profile", Detail = "One crop, every perspective" },
-        new { Page = "area", Action = "AreaProfile", Icon = "pin", Title = "Area profile", Detail = "Explore the places that grow" },
-        new { Page = "compare", Action = "Compare", Icon = "bars", Title = "Rankings & race", Detail = "Follow a changing leaderboard" }
+        new { Page = "crop", Action = "CropProfile", Icon = "sprout", Title = "Crop profile", Detail = "Production, area and yield" },
+        new { Page = "area", Action = "AreaProfile", Icon = "pin", Title = "Area profile", Detail = "Explore your region" },
+        new { Page = "areaCompare", Action = "AreaComparison", Icon = "grid", Title = "Area comparison", Detail = "Two places, every crop" },
+        new { Page = "compare", Action = "Compare", Icon = "bars", Title = "Rankings & trends", Detail = "Compare places over time" }
     };
 }
 <a class="skip-link" href="#main-content">Skip to content</a>
 <button class="nav-backdrop" type="button" aria-label="Close navigation" hidden></button>
-<aside class="sidebar atlas-sidebar" id="crop-navigation" aria-label="Crop Atlas navigation">
+<aside class="sidebar atlas-sidebar" id="crop-navigation" aria-label="Crop Statistics navigation">
     <div class="sidebar-brand-row">
-        <a class="brand" href="@Url.Action("Home", "Crops")"><span class="brand-emblem"><svg class="brand-crop" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#wheat")"></use></svg></span><span><small>PAKISTAN</small><strong>Crop Atlas</strong><em>Fields. Figures. Futures.</em></span></a>
+        <a class="brand" href="@Url.Action("Home", "Crops")"><img class="pbs-brand-logo" src="@Url.Content("~/Content/images/logo.png")" alt="Pakistan Bureau of Statistics" width="199" height="107" /><span><strong>Crop Statistics</strong><em>Production &middot; Area &middot; Yield</em></span></a>
         <button id="menu-close" class="shell-icon-button" type="button" aria-label="Close navigation"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-close")"></use></svg></button>
     </div>
     <div class="sidebar-divider"></div>
-    <p class="nav-label">EXPLORE THE ATLAS</p>
+    <p class="nav-label">EXPLORE</p>
     <nav class="atlas-menu" aria-label="Crop dashboard pages">
         @foreach (var item in items) {
             var active = cropPage == item.Page;
-            <a href="@Url.Action(item.Action, "Crops")" data-nav="@item.Page" class="@(active ? "active" : "")" aria-current="@(active ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-" + item.Icon)"></use></svg></span><span class="menu-copy"><strong>@item.Title</strong><small>@item.Detail</small></span><svg class="shell-icon menu-arrow" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg></a>
+            if (item.Page == "areaCompare") {
+                <details class="comparison-menu-group">
+                    <summary data-nav="areaCompare" class="@(active ? "active" : "")"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-grid")"></use></svg></span><span class="menu-copy"><strong>Area comparison</strong><small>Two places, every crop</small></span><svg class="shell-icon menu-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></summary>
+                    <div class="area-submenu comparison-submenu" aria-label="Area comparison levels">
+                        @foreach (var comparison in new[] { "province", "division", "district" }) {
+                            var selected = active && comparisonLevel == comparison;
+                            <a href="@Url.Action("AreaComparison", "Crops", new { level = comparison })" data-compare-nav="@comparison" class="@(selected ? "active" : "")" aria-current="@(selected ? "page" : null)">@(comparison == "province" ? "Province" : comparison == "division" ? "Division" : "District")</a>
+                        }
+                    </div>
+                </details>
+            } else {
+            <a href="@Url.Action(item.Action, "Crops")" data-nav="@item.Page" class="@(active ? "active" : "")" aria-current="@(active && item.Page != "area" ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-" + item.Icon)"></use></svg></span><span class="menu-copy"><strong>@item.Title</strong><small>@item.Detail</small></span><svg class="shell-icon menu-arrow" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg></a>
+            }
+            if (item.Page == "area") {
+                <div class="area-submenu" aria-label="Area profile levels">
+                    <a href="@Url.Action("ProvinceProfile", "Crops")" data-area-nav="province" class="@(areaLevel == "province" ? "active" : "")" aria-current="@(areaLevel == "province" ? "page" : null)">Provinces</a>
+                    <a href="@Url.Action("DivisionProfile", "Crops")" data-area-nav="division" class="@(areaLevel == "division" ? "active" : "")" aria-current="@(areaLevel == "division" ? "page" : null)">Divisions</a>
+                    <a href="@Url.Action("DistrictProfile", "Crops")" data-area-nav="district" class="@(areaLevel == "district" ? "active" : "")" aria-current="@(areaLevel == "district" ? "page" : null)">Districts</a>
+                </div>
+            }
         }
     </nav>
     @if (isAdmin) {
@@ -31,9 +54,8 @@
             <a href="@Url.Action("Import", "CropAdmin")" class="@(adminPage == "import" ? "active" : "")" aria-current="@(adminPage == "import" ? "page" : null)"><span class="menu-icon"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-upload")"></use></svg></span><span class="menu-copy"><strong>Import crop data</strong><small>Bring the next harvest into view</small></span></a>
         </nav>
     }
-    <div class="sidebar-note atlas-sidebar-bottom">
-        <div class="sidebar-field-note"><svg aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#rice")"></use></svg><p>Discover the story<br /><strong>behind every harvest.</strong></p><small>Production · Land · Productivity</small></div>
-        <a class="return-dashboard" href="@Url.Action("Index", "GDP")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-grid")"></use></svg><span>Main dashboard</span><span aria-hidden="true">↗</span></a>
-        <div class="sidebar-source"><span class="live-dot"></span>Pakistan Bureau of Statistics</div>
-    </div>
+    <nav class="sidebar-utility" aria-label="Information and account">
+        <a href="@Url.Action("About", "Crops")" class="@(cropPage == "about" ? "active" : "")" aria-current="@(cropPage == "about" ? "page" : null)"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-grid")"></use></svg><span>About</span></a>
+        <a href="@Url.Action("Login", "CropAdmin")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-shield")"></use></svg><span>Sign in</span></a>
+    </nav>
 </aside>

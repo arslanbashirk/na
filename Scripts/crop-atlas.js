@@ -21,7 +21,7 @@
     const iconUrl = name => root + 'Content/crop-icons.svg#' + cropSymbol(name);
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const names = { overview: 'Overview', crop: 'Crop profile', area: 'Area profile', compare: 'Rankings & race' };
-    $id('breadcrumb').textContent = names[page];
+    if ($id('breadcrumb')) $id('breadcrumb').textContent = names[page];
     document.querySelector('[data-nav="' + page + '"]').classList.add('active');
     $id('intro').textContent = { overview: 'Explore crop production, productivity and the places behind the numbers.', crop: 'Trace one crop across places and years. Find leaders, shifts and opportunities.', area: 'Discover a place’s crop mix, historical performance and regional position.', compare: 'Compare reporting areas and watch their rankings change through time.' }[page];
     $id('race-section').hidden = page !== 'compare';
@@ -86,7 +86,16 @@
     }
     function syncUrl() {
         window.history.replaceState(null, '', '?' + new URLSearchParams(state));
-        document.querySelectorAll('[data-nav]').forEach(a => { const actions = { overview: 'Home', crop: 'CropProfile', area: 'AreaProfile', compare: 'Compare' }; a.href = url(actions[a.dataset.nav]); });
+        document.querySelectorAll('a[data-nav]').forEach(a => {
+            const actions = { overview: 'Home', crop: 'CropProfile', area: 'AreaProfile', compare: 'Compare' };
+            a.href = url(actions[a.dataset.nav]);
+        });
+        document.querySelectorAll('[data-compare-nav]').forEach(a => {
+            const level = a.dataset.compareNav;
+            const params = { level, year: state.year };
+            if (state[level] !== '0') params.a = state[level];
+            a.href = root + 'Crops/AreaComparison?' + new URLSearchParams(params);
+        });
     }
     function status(message, error) { $id('status').textContent = message; $id('status').className = error ? 'error' : ''; }
     function load() {
@@ -225,13 +234,27 @@
         try {
             const bounds = await boundaries(level);
             if (seq !== mapSerial) return;
-            if (!map) { map = L.map('map', { scrollWheelZoom: false }).setView([29.7, 69.3], 5); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 18 }).addTo(map); }
+            if (!map) {
+                map = L.map('map', { scrollWheelZoom: false }).setView([29.7, 69.3], 5);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap contributors', maxZoom: 18 }).addTo(map);
+                const legendControl = L.control({ position: 'bottomright' });
+                legendControl.onAdd = () => {
+                    const legend = $id('legend');
+                    legend.setAttribute('role', 'group');
+                    legend.setAttribute('aria-label', 'Map colour legend');
+                    L.DomEvent.disableClickPropagation(legend);
+                    L.DomEvent.disableScrollPropagation(legend);
+                    return legend;
+                };
+                legendControl.addTo(map);
+            }
             const rows = decorate(grouped(current, level), grouped(prior, level));
             const values = rows.map(r => metric === 'Share' ? r.Share : metric === 'Growth' ? r.Growth : r[metric]).filter(v => v != null && Number.isFinite(v));
             const ordered = values.slice().sort((a, b) => a - b);
             const breaks = [...new Set([.2, .4, .6, .8].map(q => ordered[Math.max(0, Math.ceil(ordered.length * q) - 1)]).filter(v => v != null))];
-            const greens = { Production: ['#ffe18a', '#a7d96b', '#36bf91', '#098f92', '#12548a'], Area: ['#ffe6a3', '#ffce52', '#f6a32b', '#ee7350', '#b43c58'], Yield: ['#e8dcff', '#c3a5f4', '#9674e2', '#7152cc', '#453394'], Share: ['#ddf4ee', '#a2d9df', '#60b7d6', '#388dc5', '#31599d'] }[metric] || ['#e2ecd5', '#b9d3a1', '#7faa77', '#49825d', '#20553b'];
-            const color = value => value == null ? '#e4e5e1' : metric === 'Growth' ? value === 0 ? '#e8eee5' : value < 0 ? '#cc7156' : '#18876f' : greens[breaks.filter(b => value > b).length];
+            const shades = { Production: ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'], Area: ['#fff5eb', '#fdd0a2', '#fdae6b', '#e6550d', '#a63603'], Yield: ['#f2f0f7', '#cbc9e2', '#9e9ac8', '#756bb1', '#54278f'], Share: ['#eff3ff', '#bdd7e7', '#6baed6', '#3182bd', '#08519c'] }[metric] || ['#edf8e9', '#bae4b3', '#74c476', '#31a354', '#006d2c'];
+            const greens = Array.from({ length: breaks.length + 1 }, (_, i) => shades[breaks.length ? Math.round(i * (shades.length - 1) / breaks.length) : 2]);
+            const color = value => value == null || !Number.isFinite(value) ? '#e4e5e1' : metric === 'Growth' ? value === 0 ? '#f5f5f0' : value < 0 ? '#b35806' : '#01665e' : greens[breaks.filter(b => value > b).length];
             const rowMap = new Map(rows.map(r => [Number(r.id), r]));
             const specialRows = level === 'district' ? rows.filter(r => combined(r.id)) : [];
             const features = bounds.filter(b => !specialRows.some(r => isMember(b.code, r.id))).map(b => ({ type: 'Feature', geometry: b.boundary, properties: { name: clean(b.name), code: String(b.code), row: rowMap.get(Number(b.code)) } }));
@@ -255,9 +278,19 @@
             const selected = features.filter(f => f.properties.row);
             mapBounds = features.length ? L.geoJSON(selected.length && state.province !== '0' ? selected : features).getBounds() : null;
             if (mapBounds) map.fitBounds(mapBounds, { padding: [20, 20], maxZoom: 9 });
-            const missingColor = '<span><i style="background:#e4e5e1"></i>No data</span>';
-            $id('legend').innerHTML = metric === 'Growth' ? '<span><i style="background:#cc7156"></i>Decline</span><span><i style="background:#18876f"></i>Growth</span><span><i style="background:#e8eee5"></i>Unchanged</span>' + missingColor : breaks.concat([Infinity]).map((b, i) => '<span><i style="background:' + greens[i] + '"></i>' + (i ? '> ' + number(breaks[i - 1], metric === 'Yield' ? 3 : 1) + (b === Infinity ? '' : ' – ' + number(b, metric === 'Yield' ? 3 : 1)) : '≤ ' + number(b, metric === 'Yield' ? 3 : 1)) + '</span>').join('') + missingColor;
-            if (!values.length) $id('legend').innerHTML = missingColor;
+            const decimals = metric === 'Yield' ? 3 : 1;
+            const unit = metric === 'Share' || metric === 'Growth' ? '%' : metric === 'Yield' ? 'production / area' : 'reported source units';
+            const displayValue = v => v == null || !Number.isFinite(v) ? 'No data' : (metric === 'Growth' && v > 0 ? '+' : '') + number(v, decimals) + (unit === '%' ? '%' : '');
+            const band = (shade, label) => '<span class="legend-band"><i style="background:' + shade + '"></i><span>' + label + '</span></span>';
+            let bands = metric === 'Growth' ? band('#b35806', 'Decline: &lt; 0%') + band('#f5f5f0', 'Unchanged: 0%') + band('#01665e', 'Growth: &gt; 0%') : breaks.concat([Infinity]).map((b, i) => band(greens[i], !breaks.length ? 'All reported values' : (i ? '&gt; ' + displayValue(breaks[i - 1]) + (b === Infinity ? '' : ' to &le; ' + displayValue(b)) : '&le; ' + displayValue(b)))).join('');
+            if (!values.length) bands = '';
+            $id('legend').innerHTML = '<div class="legend-kicker">MAP KEY</div><div class="legend-heading"><strong>' + escape(metric === 'Growth' ? 'Year-on-year production change' : metric) + '</strong><span>' + escape(unit) + '</span></div><div class="legend-bands">' + bands + band('#e4e5e1', 'No data') + '</div><div class="legend-caption">' + (metric === 'Growth' ? 'Compared with ' + escape(data.previous || 'preceding year') : 'Light to dark: lower to higher' + (breaks.length ? ' &middot; quantile classes' : '')) + '</div>';
+            const mappedRows = features.map(f => ({ name: f.properties.name, row: f.properties.row, id: f.properties.code }));
+            const metricValue = r => r.row && Number.isFinite(r.row[metric]) ? r.row[metric] : null;
+            mappedRows.sort((a, b) => (metricValue(b) == null ? -Infinity : metricValue(b)) - (metricValue(a) == null ? -Infinity : metricValue(a)) || a.name.localeCompare(b.name));
+            $id('map-stats-context').textContent = (metric === 'Growth' ? 'YoY production change' : metric) + ' | ' + unit + ' | ' + mappedRows.filter(r => metricValue(r) != null).length + ' reporting ' + (level === 'province' ? 'provinces' : level === 'division' ? 'divisions' : 'districts');
+            $id('map-stats').innerHTML = mappedRows.length ? mappedRows.map(r => '<button type="button" class="map-stat-row" data-map-place="' + escape(r.id) + '"' + (r.row ? '' : ' disabled') + '><i style="background:' + color(metricValue(r)) + '"></i><span>' + escape(r.name) + '</span><strong>' + escape(displayValue(metricValue(r))) + '</strong></button>').join('') : '<p class="map-stats-empty">No mapped places in this selection.</p>';
+            $id('map-stats').querySelectorAll('[data-map-place]').forEach(button => button.onclick = () => drillArea(button.dataset.mapPlace, level));
             $id('map-description').textContent = metric === 'Growth' ? 'Production change vs ' + (data.previous || 'preceding year') + '. Click a place to focus this view.' : metric === 'Share' ? 'Share of selected-region crop production. Click a place to focus this view.' : metric + (metric === 'Yield' ? ' = production / area.' : ' in reported source units.') + ' Click a place to focus this view.';
             map.invalidateSize();
         } catch (e) { $id('map-description').textContent = e.message + '. Charts and tables remain available.'; }
@@ -302,9 +335,9 @@
     function exportCsv() {
         if (!data) return;
         const cell = v => '"' + (typeof v === 'number' ? String(v) : String(v == null ? '' : v).replace(/^[=+@-]/, "'$&")).replace(/"/g, '""') + '"';
-        const rows = [['Pakistan Crop Atlas', names[page]], ['Crop', $id('crop').selectedOptions[0].textContent], ['Fiscal year', data.year], ['Geography', $id('selection').textContent], ['Units', 'Reported source units; yield = production / area'], ['Dataset', $id('table-mode').value], ['Name', 'Area', 'Production', 'Yield', 'Production change (%)', 'Incomplete source records']].concat(tableRows.map(r => [r.name, r.Area, r.Production, r.Yield, r.Growth, r.MissingRows]));
+        const rows = [['Pakistan Crop Statistics', names[page]], ['Crop', $id('crop').selectedOptions[0].textContent], ['Fiscal year', data.year], ['Geography', $id('selection').textContent], ['Units', 'Reported source units; yield = production / area'], ['Dataset', $id('table-mode').value], ['Name', 'Area', 'Production', 'Yield', 'Production change (%)', 'Incomplete source records']].concat(tableRows.map(r => [r.name, r.Area, r.Production, r.Yield, r.Growth, r.MissingRows]));
         const blob = new Blob(['\ufeff' + rows.map(r => r.map(cell).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
-        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'crop-atlas-' + data.year + '-' + $id('table-mode').value + '.csv'; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'crop-statistics-' + data.year + '-' + $id('table-mode').value + '.csv'; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000);
     }
     ['crop', 'year', 'province', 'division', 'district'].forEach(id => $id(id).addEventListener('change', () => {
         drillStack.length = 0;
@@ -334,9 +367,7 @@
     $id('table-prev').onclick = () => { tablePage--; renderTable(); };
     $id('table-next').onclick = () => { tablePage++; renderTable(); };
     $id('data-table').addEventListener('click', e => { const record = e.target.closest('[data-record]'); if (record) { if (record.dataset.recordKind === 'crops') focus({ crop: record.dataset.record }); else drillArea(record.dataset.record, 'district'); return; } const button = e.target.closest('[data-sort]'); if (!button) return; sortAscending = sortKey === button.dataset.sort ? !sortAscending : button.dataset.sort === 'name'; sortKey = button.dataset.sort; renderTable(); });
-    $id('download').onclick = exportCsv;
     $id('table-download').onclick = exportCsv;
-    $id('share').onclick = async () => { try { await navigator.clipboard.writeText(location.href); status('View link copied. It includes the selected crop, year and geography.'); } catch (e) { status('Copy this view link from your browser address bar.'); } };
     document.addEventListener('visibilitychange', () => { if (document.hidden) stopRace(); });
     window.addEventListener('pagehide', stopRace);
     let resizeTimer;

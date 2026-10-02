@@ -19,7 +19,7 @@ with sync_playwright() as p:
         ready()
         page.locator('#insights').scroll_into_view_if_needed()
         page.wait_for_function("Array.from(document.querySelectorAll('.harvest-photo, .insight-story-photo')).every(img => img.complete && img.naturalWidth > 1000)")
-        assert page.locator('.insight-story-photo').count() == 2
+        assert page.locator('.insight-story-photo').count() == (0 if route == 'AreaProfile' else 2)
         assert page.locator('.ranking-panel').count() == 0
         banner_sources.add(page.locator('.harvest-photo').get_attribute('src'))
         page.evaluate('scrollTo(0, 0)')

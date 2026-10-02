@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = null;
     var page = (string)ViewBag.CropPage;
     var titles = new System.Collections.Generic.Dictionary<string, string> {
@@ -38,7 +38,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@titles[page] · Pakistan Crop Atlas</title>
+    <title>@titles[page] · Pakistan Crop Statistics</title>
     <link rel="stylesheet" href="@Url.Content("~/Scripts/vendor/leaflet/leaflet.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/crop-atlas.css")" />
     <link rel="stylesheet" href="@Url.Content("~/Content/crop-theme.css")" />
@@ -49,7 +49,7 @@
 <body id="page-top" class="crop-shell" data-page="@page" data-api="@Url.Action("Explore", "Crops")" data-root="@Url.Content("~/")" style="--page-harvest-image: url('@sceneUrl')">
     @Html.Partial("_CropNavigation")
     <main class="workspace" id="main-content">
-        @Html.Partial("_CropHeader")
+        <button id="menu-toggle" class="shell-icon-button dashboard-menu-toggle" type="button" aria-label="Open navigation" aria-controls="crop-navigation" aria-expanded="false"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-menu")"></use></svg></button>
         <section class="hero harvest-hero"><img class="harvest-photo" src="@sceneUrl" alt="@sceneDescriptions[page]" fetchpriority="high" /><div class="hero-copy"><p class="eyebrow"><span class="hero-dot"></span> PAKISTAN · AGRICULTURE INTELLIGENCE</p><h1>@titles[page]</h1><p class="hero-deck">@decks[page]</p><p id="intro">Explore crop production, productivity and the places behind the numbers.</p><div class="hero-tags">@foreach (var topic in topics[page]) { <span>@topic</span> }</div></div><div class="hero-stamp"><small>@editions[page]</small><span id="hero-year">—</span><small>FISCAL YEAR · PAKISTAN</small></div></section>
         <nav class="section-nav" aria-label="Sections on this page"><a href="#map-section">Explore the map</a><a href="#trends-section">Follow the trend</a><a href="#profile-section">Crop & place insights</a><a href="#data-section">Explore the numbers</a></nav>
         <section class="filters" aria-label="Dashboard filters">
@@ -69,6 +69,7 @@
                 <div class="map-controls"><div id="metrics" class="segmented"><button data-metric="Production" class="active">Production</button><button data-metric="Area">Area</button><button data-metric="Yield">Yield</button><button data-metric="Share">Share</button><button data-metric="Growth">YoY change</button></div><label class="check"><input id="labels" type="checkbox" /> Show names</label></div>
                 <div id="map" aria-label="Interactive crop map"></div><div class="map-foot"><span id="map-description">Click a place to focus this view.</span><div id="legend"></div></div>
             </article>
+            <aside class="panel map-stats-panel" aria-label="Quick map stats"><div class="panel-heading"><div><p class="eyebrow">VALUES ON THE MAP</p><h2>Quick map stats</h2></div></div><div class="map-stats-context" id="map-stats-context"></div><div id="map-stats" class="map-stats-list" aria-live="polite"></div><p class="panel-note">Select a place to focus the dashboard.</p></aside>
         </section>
         <section id="trends-section" class="grid">
             <article class="panel"><div class="panel-heading"><div><p class="eyebrow">THROUGH THE YEARS</p><h2>Area & production</h2></div></div><div id="trend-chart" class="chart"></div></article>

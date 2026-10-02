@@ -1,7 +1,7 @@
-﻿@{
+@{
     var isDashboard = ViewBag.CropPage != null;
     var isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "admin";
-    var names = new System.Collections.Generic.Dictionary<string, string> { { "overview", "Overview" }, { "crop", "Crop profile" }, { "area", "Area profile" }, { "compare", "Rankings & race" } };
+    var names = new System.Collections.Generic.Dictionary<string, string> { { "overview", "Overview" }, { "crop", "Crop profile" }, { "area", "Area profile" }, { "areaCompare", "Area comparison" }, { "about", "About" }, { "compare", "Rankings & race" } };
     var heading = isDashboard ? names[(string)ViewBag.CropPage] : (string)ViewBag.Title;
 }
 <header class="topbar atlas-header">
@@ -23,7 +23,7 @@
         } else if (isDashboard) {
             <a class="quiet admin-entry" href="@Url.Action("Login", "CropAdmin")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-shield")"></use></svg><span>Admin sign in</span></a>
         } else {
-            <a class="quiet admin-entry" href="@Url.Action("Home", "Crops")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg><span>Back to atlas</span></a>
+            <a class="quiet admin-entry" href="@Url.Action("Home", "Crops")"><svg class="shell-icon" aria-hidden="true"><use href="@Url.Content("~/Content/crop-icons.svg#shell-arrow")"></use></svg><span>Back to crop statistics</span></a>
         }
     </div>
 </header>
