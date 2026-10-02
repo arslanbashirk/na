@@ -130,9 +130,6 @@
         $id('selected-crop-symbol').setAttribute('href', iconUrl(cropName));
         $id('focus-back').hidden = drillStack.length === 0;
         renderFocusTrail();
-        const favorites = ['Wheat', 'Rice', 'Cotton', 'Maize', 'Sugarcane', 'Potato'];
-        const featured = favorites.map(name => data.crops.find(c => c.name.toLowerCase() === name.toLowerCase())).filter(Boolean);
-        $id('crop-strip').innerHTML = featured.map(c => '<button class="crop-chip ' + (String(c.id) === state.crop ? 'active' : '') + '" data-crop="' + c.id + '" type="button"><svg aria-hidden="true"><use href="' + iconUrl(c.name) + '"></use></svg><strong>' + escape(c.name) + '</strong><span>Explore crop</span></button>').join('');
         $id('hero-year').textContent = data.year;
         $id('coverage').textContent = current.length ? current.length + ' reporting areas' : 'No observations for this selection';
         const values = [stat('Production · reported units', number(t.Production), delta(change(t.Production, p.Production)), '↗'), stat('Cultivation · reported units', number(t.Area), delta(change(t.Area, p.Area)), '▧'), stat('Yield · production / area', number(t.Yield, 3), delta(change(t.Yield, p.Yield)), '❋'), stat('Reporting coverage', number(current.length, 0), number(t.SourceRows, 0) + ' source records · ' + number(t.MissingRows, 0) + ' incomplete', '⌖')];
@@ -330,7 +327,6 @@
         else if (button.dataset.scope === 'province') focus({ division: '0', district: '0' }, 'division');
         else if (button.dataset.scope === 'division') focus({ district: '0' }, 'district');
     });
-    $id('crop-strip').addEventListener('click', e => { const chip = e.target.closest('[data-crop]'); if (chip) focus({ crop: chip.dataset.crop }); });
     document.querySelectorAll('[data-metric]').forEach(button => button.onclick = () => { document.querySelector('[data-metric].active').classList.remove('active'); button.classList.add('active'); if (data) renderMap(); });
     $id('map-level').onchange = () => { if (data) { renderMap(); renderRanking(); } };
     $id('labels').onchange = () => { if (data) renderMap(); };
