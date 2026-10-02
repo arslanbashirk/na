@@ -41,7 +41,7 @@
 .sidebar-source { padding: 16px 6px 0; font-size: 9px; color: #8da992; }
 .shell-icon-button { display: grid; place-items: center; width: 39px; height: 39px; border: 1px solid #d9e5d8; border-radius: 10px; background: #f2f7ed; color: #265e46; cursor: pointer; }
 #menu-close, #menu-toggle { display: none; }
-.crop-shell .atlas-header { position: sticky; top: 12px; z-index: 1050; min-height: 86px; height: auto; padding: 17px 20px; margin-top: 12px; border: 1px solid #e1e8db; border-top: 3px solid #dab963; border-radius: 13px; background: #fffff9f2; backdrop-filter: blur(15px); box-shadow: 0 5px 18px #23473108; gap: 20px; letter-spacing: 0; }
+.crop-shell .atlas-header { position: relative; min-height: 86px; height: auto; padding: 17px 20px; margin-top: 12px; border: 1px solid #e1e8db; border-top: 3px solid #dab963; border-radius: 13px; background: #fffff9f2; backdrop-filter: blur(15px); box-shadow: 0 5px 18px #23473108; gap: 20px; letter-spacing: 0; }
 .atlas-header .header-location { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .header-mark { display: grid; place-items: center; width: 44px; height: 48px; border-radius: 10px; background: linear-gradient(140deg, #fff0bc, #f3e5c1); border: 1px solid #e8d49d; flex-shrink: 0; }
 .header-mark svg { width: 28px; height: 35px; }
@@ -104,9 +104,9 @@
     #menu-toggle, #menu-close { display: grid; }
     #menu-close { background: #ffffff0b; color: #e4d596; border-color: #9db59240; width: 31px; height: 31px; }
     .atlas-header .header-location { gap: 10px; }
-    .crop-shell .atlas-header { top: 0; margin: 0 -24px; border-radius: 0 0 12px 12px; padding: 17px 24px; }
+    .crop-shell .atlas-header { margin: 0 -24px; border-radius: 0 0 12px 12px; padding: 17px 24px; }
     .header-mark { display: none; }
-    html { scroll-padding-top: 110px; }
+    html { scroll-padding-top: 24px; }
 }
 @media (max-width: 600px) {
     .crop-shell .workspace { padding: 0 14px 20px; }
@@ -130,7 +130,7 @@
     .footer-bottom { flex-wrap: wrap; padding: 18px 23px; font-size: 9px; gap: 15px; }
     .footer-bottom > span:first-child { width: 100%; }
     .footer-credit { flex: 1; }
-    html { scroll-padding-top: 142px; }
+    html { scroll-padding-top: 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
     .crop-shell .atlas-sidebar, .atlas-sidebar .atlas-menu a { transition: none; }
