@@ -15,7 +15,7 @@ with sync_playwright() as p:
     page.goto(BASE + '/Crops/Home')
     page.wait_for_function("document.querySelector('#status').textContent.startsWith('Data loaded')", timeout=60000)
     assert page.locator('.admin-links').count() == 0
-    assert page.locator('.crop-chip').count() >= 4
+    assert page.locator('.crop-strip').count() == 0
     assert page.locator('.brand-crop use').count() == 1
     page.screenshot(path=str(Path(os.environ['TEMP']) / 'crop-atlas-color-desktop.png'), full_page=True)
     for route in ['Explorer', 'Import', 'Template']:
